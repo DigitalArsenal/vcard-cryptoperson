@@ -1,0 +1,32 @@
+{
+  "type": "module",
+  "name": "vcard_person",
+  "version": "1.0.0",
+  "description": "a vCard to Schema.org Person converter",
+  "main": "index.ts",
+  "scripts": {
+    "build": "tsc src/index.ts --outfile dist/index.mjs",
+    "test": "node --experimental-specifier-resolution=node --loader ts-node/esm test/test.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TJKoury/vcard_person.git"
+  },
+  "keywords": [
+    "vcard",
+    "ical",
+    "schema",
+    "schema.org",
+    "person"
+  ],
+  "author": "TJKoury",
+  "license": "CLOSED",
+  "bugs": {
+    "url": "https://github.com/TJKoury/vcard_person/issues"
+  },
+  "homepage": "https://github.com/TJKoury/vcard_person#readme",
+  "devDependencies": {
+    "ts-node": "^10.5.0",
+    "typescript": "^4.5.5"
+  }
+}
