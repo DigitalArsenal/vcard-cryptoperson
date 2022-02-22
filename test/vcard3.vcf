@@ -5,8 +5,8 @@ N:Perrault;Simon;J;Dr.;ing. jr, M.Sc.
 FN:Dr. Simon J Perrault
 ORG:Canada Pharma., Inc;
 TITLE:Scientist
-EMAIL;type=INTERNET;type=home;mobile@email.com
-TEL;type=home;tel:+1-418-656-9254;ext=102
-EMAIL;type=INTERNET;type=work;home@email.com
-TEL;type=work;tel:+1-418-656-9254;ext=102
+EMAIL;type=INTERNET;type=home:mobile@email.com
+TEL;type=home;type=VOICE:(864) 986-0602
+EMAIL;type=INTERNET;type=work:home@email.com
+TEL;type=work;type=VOICE:(555) 986-0602
 END:VCARD

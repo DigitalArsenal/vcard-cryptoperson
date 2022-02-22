@@ -63,14 +63,14 @@ let myPerson: Person = {
             "@type": "ContactPoint",
             "contactType": "home",
             "name": "mobile",
-            "telephone": "tel:+1-418-656-9254;ext=102",
+            "telephone": "(864) 986-0602",
             "email": "mobile@email.com"
         },
         {
             "@type": "ContactPoint",
             "name": "home",
             "contactType": "work",
-            "telephone": "tel:+1-418-656-9254;ext=102",
+            "telephone": "(555) 986-0602",
             "email": "home@email.com",
         },
     ]
@@ -245,10 +245,10 @@ TITLE:${hasOccupation.name}
         let contact: any = contactPoint[c];
         console.log(contact);
         if (contact.email) {
-            vCard += `EMAIL;type=INTERNET;type=${contact.contactType};${contact.email}\n`;
+            vCard += `EMAIL;type=INTERNET;type=${contact.contactType}:${contact.email}\n`;
         }
         if (contact.telephone) {
-            vCard += `TEL;type=${contact.contactType};${contact.telephone}\n`;
+            vCard += `TEL;type=${contact.contactType};type=VOICE:${contact.telephone}\n`;
         }
     }
     /*
