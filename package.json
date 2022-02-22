@@ -2,10 +2,10 @@
   "type": "module",
   "name": "vcard_person",
   "version": "1.0.0",
-  "description": "a vCard to Schema.org Person converter",
-  "main": "index.ts",
+  "description": "Schema.org Person to vCard converter",
+  "main": "dist/index.js",
   "scripts": {
-    "build": "tsc src/index.ts --outfile dist/index.mjs",
+    "build": "rm -rf dist && tsc",
     "test": "node --experimental-specifier-resolution=node --loader ts-node/esm test/test.ts",
     "dev": "nodemon"
   },
