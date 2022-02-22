@@ -33,7 +33,6 @@
   },
   "dependencies": {
     "digital-arsenal-schema-dts": "^1.0.0",
-    "vcard-creator": "^0.4.2",
     "vcard4": "^3.0.1"
   }
 }

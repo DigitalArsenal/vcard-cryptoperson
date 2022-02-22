@@ -1,5 +1,4 @@
 import * as vcard4 from "vcard4";
-import vcard3 from "vcard-creator";
 
 let {
     TextType,
@@ -31,7 +30,7 @@ let {
 } = vcard4;
 
 import { writeFile } from "fs";
-import { Person, PostalAddress } from "digital-arsenal-schema-dts";
+import { Person, Organization, Occupation, ContactPoint, PostalAddress } from "digital-arsenal-schema-dts";
 
 let myPerson: Person = {
     "@type": "Person",
@@ -40,28 +39,65 @@ let myPerson: Person = {
     honorificPrefix: "Dr.",
     honorificSuffix: "ing. jr, M.Sc.",
     additionalName: "J",
-    address: {
-        "@type": "PostalAddress",
-        streetAddress: "",
-        addressCountry: ""
-    }
+    hasOccupation: {
+        "@type": "Occupation",
+        "name": "Scientist"
+    },
+    affiliation: {
+        "@type": "Organization",
+        "legalName": "Canada Pharma., Inc",
+        "name": "Canada Pharma., Inc"
+    },
+    contactPoint: [
+        {
+            "@type": "PostalAddress",
+            "contactType": "pref",
+            postOfficeBoxNumber: "Suite D2-630",
+            streetAddress: "2875 Laurier",
+            addressLocality: "Quebec",
+            addressRegion: "QC",
+            addressCountry: "Canada",
+            postalCode: "G1V 2M2"
+        },
+        {
+            "@type": "ContactPoint",
+            "contactType": "home",
+            "name": "mobile",
+            "telephone": "tel:+1-418-656-9254;ext=102",
+            "email": "mobile@email.com"
+        },
+        {
+            "@type": "ContactPoint",
+            "name": "home",
+            "contactType": "work",
+            "telephone": "tel:+1-418-656-9254;ext=102",
+            "email": "home@email.com",
+        },
+    ]
 };
 
 console.log(myPerson);
 
-
 const createV4 = (person: Person): string => {
 
+    let { familyName,
+        givenName,
+        honorificPrefix,
+        honorificSuffix,
+        additionalName,
+        address
+    } = person;
     //FN property
-    const fn = new FNProperty([], new TextType(`${person.honorificPrefix} ${person.additionalName} ${person.givenName} ${person.familyName} ${person.honorificSuffix}`));
+    const fn = new FNProperty([], new TextType(`${honorificPrefix} ${givenName} ${additionalName} ${familyName}`));
 
     //N property
     const nArr = new Array(5);
-    nArr[0] = new TextType("Perreault");
-    nArr[1] = new TextType("Simon");
-    nArr[2] = new TextType("J");
-    nArr[3] = new TextType("Dr.");
-    nArr[4] = new TextListType([new TextType("ing. jr"), new TextType("M.Sc.")]);
+    nArr[0] = new TextType(familyName as string);
+    nArr[1] = new TextType(givenName as string);
+    nArr[2] = new TextType(additionalName as string);
+    nArr[3] = new TextType(honorificPrefix as string);
+    nArr[4] = new TextListType((honorificSuffix as string).split(",").map(v => { return new TextType(v) }));
+
     const n = new NProperty([], new SpecialValueType(nArr, "nproperty"));
 
     // BDAY property
@@ -183,31 +219,64 @@ const createV4 = (person: Person): string => {
     ]).repr();
 }
 
-const createV3 = (person: Person) => {
+const createV3 = (person: Person, format: string = "vcalendar") => {
     //@ts-ignore
-    let vc = new vcard3.default();
-    return vc
-        .addName(
-            person.familyName,
-            person.givenName,
-            person.additionalName,
-            person.honorificPrefix,
-            person.honorificSuffix)
-        .addCompany('Siesqo')
-        .addJobtitle('Web Developer')
-        .addRole('Data Protection Officer')
-        .addEmail('info@jeroendesloovere.be')
-        .addPhoneNumber(1234121212, 'PREF;WORK')
-        .addPhoneNumber(123456789, 'WORK')
-        .addAddress(null, null, 'street', 'worktown', null, 'workpostcode', 'Belgium')
-        .addURL('http://www.jeroendesloovere.be').toString()
+    let { familyName,
+        givenName,
+        honorificPrefix,
+        honorificSuffix,
+        additionalName,
+    } = person;
+
+    let affiliation = person.affiliation as Organization;
+    let hasOccupation = person.hasOccupation as Occupation;
+    let address = person.address as PostalAddress;
+    let contactPoint = person.contactPoint as Array<any>;
+    let vCard = `BEGIN:VCARD
+VERSION:3.0
+PRODID;VALUE=TEXT:-//Apple Inc.//iPhone OS 15.1.1//EN
+N:${familyName};${givenName};${additionalName};${honorificPrefix};${honorificSuffix}
+FN:${honorificPrefix} ${givenName} ${additionalName} ${familyName}
+ORG:${affiliation.legalName || affiliation.name};
+TITLE:${hasOccupation.name}
+`;
+
+    for (let c = 0; c < contactPoint.length; c++) {
+        let contact: any = contactPoint[c];
+        console.log(contact);
+        if (contact.email) {
+            vCard += `EMAIL;type=INTERNET;type=${contact.contactType};${contact.email}\n`;
+        }
+        if (contact.telephone) {
+            vCard += `TEL;type=${contact.contactType};${contact.telephone}\n`;
+        }
+    }
+    /*
+    item1.ADR;type=HOME;type=pref:;;P.O. Box 1113\nMy Street;Denver;CO;10110;United States
+    item1.X-ABADR:us
+    
+    
+    EMAIL;type=INTERNET;type=HOME;type=pref:${email}
+    TEL;type=WORK;type=pref:${telephone}
+    item1.ADR;type=HOME;type=pref:;;${address.postOfficeBoxNumber};${city};${state};${zip};${address?.country.name || ""}
+    item1.X-ABADR:${address?.country?.code || ""}
+    ITEM2.X-ABRELATEDNAMES:${id}
+    ITEM2.X-ABLABEL:btc_address
+    ITEM4.X-ABRELATEDNAMES:KEYMASTER_ID:${btoa(JSON.stringify(user))}
+    ITEM4.X-ABLABEL:B_ID
+    */
+
+    vCard += `END:VCARD`;
+    return vCard;
 
 }
 
 let v3Card = createV3(myPerson);
 let v4Card = createV4(myPerson);
 
-console.log(v3Card, v4Card);
+console.log(v3Card);
+console.log(" ");
+console.log(v4Card);
 
 let vcard3Path = "./test/vcard3.vcf";
 let vcard4Path = "./test/vcard4.vcf";

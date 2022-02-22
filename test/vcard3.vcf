@@ -1,15 +1,12 @@
 BEGIN:VCARD
 VERSION:3.0
-REV:2022-02-22T16:02:48.549Z
-N;CHARSET=utf-8:Perrault;Simon;J;Dr.;ing. jr, M.Sc.
-FN;CHARSET=utf-8:Dr. Simon J Perrault ing. jr, M.Sc.
-ORG;CHARSET=utf-8:Siesqo
-TITLE;CHARSET=utf-8:Web Developer
-ROLE;CHARSET=utf-8:Data Protection Officer
-EMAIL;INTERNET:info@jeroendesloovere.be
-TEL;PREF;WORK:1234121212
-TEL;WORK:123456789
-ADR;WORK;POSTAL;CHARSET=utf-8:null;null;street;worktown;null;workpostcode
- ;Belgium
-URL:http://www.jeroendesloovere.be
+PRODID;VALUE=TEXT:-//Apple Inc.//iPhone OS 15.1.1//EN
+N:Perrault;Simon;J;Dr.;ing. jr, M.Sc.
+FN:Dr. Simon J Perrault
+ORG:Canada Pharma., Inc;
+TITLE:Scientist
+EMAIL;type=INTERNET;type=home;mobile@email.com
+TEL;type=home;tel:+1-418-656-9254;ext=102
+EMAIL;type=INTERNET;type=work;home@email.com
+TEL;type=work;tel:+1-418-656-9254;ext=102
 END:VCARD
