@@ -30,10 +30,20 @@ let {
 } = vcard4;
 
 import { writeFile } from "fs";
-import { Person, Organization, Occupation, ContactPoint, PostalAddress } from "digital-arsenal-schema-dts";
+import { PersonPublicKey, cryptoKey } from "../src/class/class";
+import { PostalAddress, Organization, Occupation } from "digital-arsenal-schema-dts";
 
-let myPerson: Person = {
+let myPerson: PersonPublicKey = {
     "@type": "Person",
+    key: [
+        {
+            "@type": "CryptoKey",
+            key: "03b8b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d",
+            keyAddress: "bc1q54xdp0rtaxa7aehh9flnav2e4gqdfyeru38zep",
+            keyType: 0
+        }
+    ],
+
     familyName: "Perrault",
     givenName: "Simon",
     honorificPrefix: "Dr.",
@@ -48,10 +58,20 @@ let myPerson: Person = {
         "legalName": "Canada Pharma., Inc",
         "name": "Canada Pharma., Inc"
     },
+    address: {
+        "@type": "PostalAddress",
+        "name": "work",
+        postOfficeBoxNumber: "Suite D1-630",
+        streetAddress: "1111 Work Street",
+        addressLocality: "Quebec",
+        addressRegion: "QC",
+        addressCountry: "Canada",
+        postalCode: "G1V 2M2"
+    },
     contactPoint: [
         {
             "@type": "PostalAddress",
-            "contactType": "pref",
+            "name": "home",
             postOfficeBoxNumber: "Suite D2-630",
             streetAddress: "2875 Laurier",
             addressLocality: "Quebec",
@@ -78,8 +98,8 @@ let myPerson: Person = {
 
 console.log(myPerson);
 
-const createV4 = (person: Person): string => {
-
+const createV4 = (person: PersonPublicKey): string => {
+    throw Error("Not Implemented");
     let { familyName,
         givenName,
         honorificPrefix,
@@ -219,7 +239,9 @@ const createV4 = (person: Person): string => {
     ]).repr();
 }
 
-const createV3 = (person: Person, format: string = "vcalendar") => {
+const createAddress = (address: PostalAddress, prefix: string = "ADR") => `${prefix};type=${address.name || "work"};type=pref:;;${address.postOfficeBoxNumber}\\n${address.streetAddress};${address.addressLocality};${address.addressRegion};${address.postalCode};${address.addressCountry}\n`;
+
+const createV3 = (person: PersonPublicKey, format: string = "vcalendar") => {
     //@ts-ignore
     let { familyName,
         givenName,
@@ -240,15 +262,21 @@ FN:${honorificPrefix} ${givenName} ${additionalName} ${familyName}
 ORG:${affiliation.legalName || affiliation.name};
 TITLE:${hasOccupation.name}
 `;
-
+    if (address) {
+        vCard += createAddress(address);
+    }
+    let itemCount: number = 1;
     for (let c = 0; c < contactPoint.length; c++) {
         let contact: any = contactPoint[c];
-        console.log(contact);
+
         if (contact.email) {
             vCard += `EMAIL;type=INTERNET;type=${contact.contactType}:${contact.email}\n`;
         }
         if (contact.telephone) {
             vCard += `TEL;type=${contact.contactType};type=VOICE:${contact.telephone}\n`;
+        }
+        if (contact["@type"] === "PostalAddress") {
+            vCard += createAddress(contact, `item${itemCount}.ADR`);
         }
     }
     /*
@@ -272,18 +300,11 @@ TITLE:${hasOccupation.name}
 }
 
 let v3Card = createV3(myPerson);
-let v4Card = createV4(myPerson);
 
 console.log(v3Card);
-console.log(" ");
-console.log(v4Card);
 
 let vcard3Path = "./test/vcard3.vcf";
-let vcard4Path = "./test/vcard4.vcf";
 
 writeFile(vcard3Path, v3Card, () => {
     console.log('vCard written to ' + vcard3Path)
-});
-writeFile(vcard4Path, v4Card, () => {
-    console.log('vCard written to ' + vcard4Path)
 });

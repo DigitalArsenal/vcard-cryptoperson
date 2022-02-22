@@ -9,7 +9,7 @@ EMAIL;type=INTERNET;type=HOME;type=pref:test@mail.com
 EMAIL;type=INTERNET;type=HOME:tjkoury@gmail.com
 TEL;type=CELL;type=VOICE;type=pref:(555) 555-1212
 TEL;type=HOME;type=VOICE:(864) 986-0602
-ADR;type=HOME;type=pref:;;811 Test DSt;Test;VA;20155;United States
+ADR;type=WORK;type=pref:;;P.O. Box Suite 111\nTenbrook;Gainesville;VA;20155;United States
 item1.ADR;type=HOME:;;Tenbrook Drive;Gainesville;VA;20155;United States
 item1.X-ABADR:us
 PHOTO;ENCODING=b:iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAADNkKWqAAAAAXNSR0IArs
