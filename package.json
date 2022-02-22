@@ -27,11 +27,15 @@
   },
   "homepage": "https://github.com/TJKoury/vcard_person#readme",
   "devDependencies": {
+    "@types/atob": "^2.1.2",
+    "@types/btoa": "^1.2.3",
     "nodemon": "^2.0.15",
     "ts-node": "^10.5.0",
     "typescript": "^4.5.5"
   },
   "dependencies": {
+    "atob": "^2.1.2",
+    "btoa": "^1.2.1",
     "digital-arsenal-schema-dts": "^1.0.0",
     "vcard4": "^3.0.1"
   }

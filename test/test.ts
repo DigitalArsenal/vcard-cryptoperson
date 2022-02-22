@@ -1,4 +1,6 @@
 import * as vcard4 from "vcard4";
+import atob from "atob";
+import btoa from "btoa";
 
 let {
     TextType,
@@ -248,14 +250,14 @@ const createV4 = (person: PersonPublicKey): string => {
 
 const createAddress = (address: PostalAddress, prefix: string = "ADR") => `${prefix};type=${address.name || "work"};type=pref:;${address.postOfficeBoxNumber};${address.streetAddress};${address.addressLocality};${address.addressRegion};${address.postalCode};${address.addressCountry}\n`;
 
-const createV3 = (person: PersonPublicKey, format: string = "vcalendar") => {
+const createV3 = (person: PersonPublicKey, format: string = "vcalendar", appendJSON: boolean = true) => {
     //@ts-ignore
-    let { familyName,
+    let {
+        familyName,
         givenName,
         honorificPrefix,
         honorificSuffix,
         additionalName,
-
     } = person;
 
     let affiliation = person.affiliation as Organization;
@@ -269,7 +271,7 @@ VERSION:3.0
 PRODID;VALUE=TEXT:-//Apple Inc.//iPhone OS 15.1.1//EN
 N:${familyName};${givenName};${additionalName};${honorificPrefix};${honorificSuffix}
 FN:${honorificPrefix} ${givenName} ${additionalName} ${familyName}
-ORG:${affiliation.legalName || affiliation.name};
+ORG:${affiliation.legalName || affiliation.name}
 TITLE:${hasOccupation.name}
 `;
     if (address) {
@@ -290,36 +292,24 @@ TITLE:${hasOccupation.name}
         }
     }
 
+
     for (let k = 0; k < key.length; k++) {
         let thisKey: cryptoKey = key[k];
-        /*
-        item3.X-ABRELATEDNAMES:03b8b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d
-item3.X-ABLabel:secp256k1_public_key*/
-        let thisItemCount = itemCount++;
-        vCard += `item${thisItemCount}.X-ABRELATEDNAMES:${thisKey.publicKey}\n`;
-        vCard += `item${thisItemCount}.X-ABLabel:cryptoKey_${0} publicKey\n`;
-        thisItemCount = itemCount++;
-        vCard += `item${thisItemCount}.X-ABRELATEDNAMES:${thisKey.keyAddress}\n`;
-        vCard += `item${thisItemCount}.X-ABLabel:cryptoKey_${0} keyAddress\n`;
-        thisItemCount = itemCount++;
-        vCard += `item${thisItemCount}.X-ABRELATEDNAMES:${SLIP_0044_TYPE[thisKey.keyType as number]},${thisKey.keyType}\n`;
-        vCard += `item${thisItemCount}.X-ABLabel:cryptoKey_${0} keyType\n`;
+        vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.publicKey}\n`;
+        vCard += `item${itemCount}.X-ABLabel:cryptoKey_${0} publicKey\n`;
+        itemCount++;
+        vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.keyAddress}\n`;
+        vCard += `item${itemCount}.X-ABLabel:cryptoKey_${0} keyAddress\n`;
+        itemCount++;
+        vCard += `item${itemCount}.X-ABRELATEDNAMES:${SLIP_0044_TYPE[thisKey.keyType as number]},${thisKey.keyType}\n`;
+        vCard += `item${itemCount}.X-ABLabel:cryptoKey_${0} keyType\n`;
     }
-
-    /*
-    item1.ADR;type=HOME;type=pref:;;P.O. Box 1113\nMy Street;Denver;CO;10110;United States
-    item1.X-ABADR:us
     
-    
-    EMAIL;type=INTERNET;type=HOME;type=pref:${email}
-    TEL;type=WORK;type=pref:${telephone}
-    item1.ADR;type=HOME;type=pref:;;${address.postOfficeBoxNumber};${city};${state};${zip};${address?.country.name || ""}
-    item1.X-ABADR:${address?.country?.code || ""}
-    ITEM2.X-ABRELATEDNAMES:${id}
-    ITEM2.X-ABLABEL:btc_address
-    ITEM4.X-ABRELATEDNAMES:KEYMASTER_ID:${btoa(JSON.stringify(user))}
-    ITEM4.X-ABLABEL:B_ID
-    */
+    if (appendJSON) {
+        itemCount++;
+        vCard += `item${itemCount}.X-ABRELATEDNAMES:${btoa(JSON.stringify(person))}\n`;
+        vCard += `item${itemCount}.X-ABLabel:Instance_ID\n`;
+    }
 
     vCard += `END:VCARD`;
     return vCard;
