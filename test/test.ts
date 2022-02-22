@@ -31,6 +31,7 @@ let {
 
 import { writeFile } from "fs";
 import { PersonPublicKey, cryptoKey } from "../src/class/class";
+import { SLIP_0044_TYPE } from "../src/class/slip_0044";
 import { PostalAddress, Organization, Occupation } from "digital-arsenal-schema-dts";
 
 let myPerson: PersonPublicKey = {
@@ -40,7 +41,13 @@ let myPerson: PersonPublicKey = {
             "@type": "CryptoKey",
             publicKey: "03b8b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d",
             keyAddress: "bc1q54xdp0rtaxa7aehh9flnav2e4gqdfyeru38zep",
-            keyType: 0
+            keyType: SLIP_0044_TYPE.BTC
+        },
+        {
+            "@type": "CryptoKey",
+            publicKey: "03b7b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d",
+            keyAddress: "bc1q54xap0rtaxa7aehh9flnav2e4gqdfyeru38zep",
+            keyType: SLIP_0044_TYPE.BTC
         }
     ],
 
@@ -284,7 +291,19 @@ TITLE:${hasOccupation.name}
     }
 
     for (let k = 0; k < key.length; k++) {
-        vCard += ``;
+        let thisKey: cryptoKey = key[k];
+        /*
+        item3.X-ABRELATEDNAMES:03b8b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d
+item3.X-ABLabel:secp256k1_public_key*/
+        let thisItemCount = itemCount++;
+        vCard += `item${thisItemCount}.X-ABRELATEDNAMES:${thisKey.publicKey}\n`;
+        vCard += `item${thisItemCount}.X-ABLabel:cryptoKey_${0} publicKey\n`;
+        thisItemCount = itemCount++;
+        vCard += `item${thisItemCount}.X-ABRELATEDNAMES:${thisKey.keyAddress}\n`;
+        vCard += `item${thisItemCount}.X-ABLabel:cryptoKey_${0} keyAddress\n`;
+        thisItemCount = itemCount++;
+        vCard += `item${thisItemCount}.X-ABRELATEDNAMES:${SLIP_0044_TYPE[thisKey.keyType as number]},${thisKey.keyType}\n`;
+        vCard += `item${thisItemCount}.X-ABLabel:cryptoKey_${0} keyType\n`;
     }
 
     /*

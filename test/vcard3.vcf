@@ -11,4 +11,16 @@ EMAIL;type=INTERNET;type=home:mobile@email.com
 TEL;type=home;type=VOICE:(864) 986-0602
 EMAIL;type=INTERNET;type=work:home@email.com
 TEL;type=work;type=VOICE:(555) 986-0602
+item2.X-ABRELATEDNAMES:03b8b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d
+item2.X-ABLabel:cryptoKey_0 publicKey
+item3.X-ABRELATEDNAMES:bc1q54xdp0rtaxa7aehh9flnav2e4gqdfyeru38zep
+item3.X-ABLabel:cryptoKey_0 keyAddress
+item4.X-ABRELATEDNAMES:BTC,0
+item4.X-ABLabel:cryptoKey_0 keyType
+item5.X-ABRELATEDNAMES:03b7b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d
+item5.X-ABLabel:cryptoKey_0 publicKey
+item6.X-ABRELATEDNAMES:bc1q54xap0rtaxa7aehh9flnav2e4gqdfyeru38zep
+item6.X-ABLabel:cryptoKey_0 keyAddress
+item7.X-ABRELATEDNAMES:BTC,0
+item7.X-ABLabel:cryptoKey_0 keyType
 END:VCARD
