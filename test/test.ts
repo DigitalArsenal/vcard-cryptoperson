@@ -38,7 +38,7 @@ let myPerson: PersonPublicKey = {
     key: [
         {
             "@type": "CryptoKey",
-            key: "03b8b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d",
+            publicKey: "03b8b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d",
             keyAddress: "bc1q54xdp0rtaxa7aehh9flnav2e4gqdfyeru38zep",
             keyType: 0
         }
@@ -239,7 +239,7 @@ const createV4 = (person: PersonPublicKey): string => {
     ]).repr();
 }
 
-const createAddress = (address: PostalAddress, prefix: string = "ADR") => `${prefix};type=${address.name || "work"};type=pref:;;${address.postOfficeBoxNumber}\\n${address.streetAddress};${address.addressLocality};${address.addressRegion};${address.postalCode};${address.addressCountry}\n`;
+const createAddress = (address: PostalAddress, prefix: string = "ADR") => `${prefix};type=${address.name || "work"};type=pref:;${address.postOfficeBoxNumber};${address.streetAddress};${address.addressLocality};${address.addressRegion};${address.postalCode};${address.addressCountry}\n`;
 
 const createV3 = (person: PersonPublicKey, format: string = "vcalendar") => {
     //@ts-ignore
@@ -248,12 +248,15 @@ const createV3 = (person: PersonPublicKey, format: string = "vcalendar") => {
         honorificPrefix,
         honorificSuffix,
         additionalName,
+
     } = person;
 
     let affiliation = person.affiliation as Organization;
     let hasOccupation = person.hasOccupation as Occupation;
     let address = person.address as PostalAddress;
     let contactPoint = person.contactPoint as Array<any>;
+    let key = person.key as Array<cryptoKey>;
+
     let vCard = `BEGIN:VCARD
 VERSION:3.0
 PRODID;VALUE=TEXT:-//Apple Inc.//iPhone OS 15.1.1//EN
@@ -276,9 +279,14 @@ TITLE:${hasOccupation.name}
             vCard += `TEL;type=${contact.contactType};type=VOICE:${contact.telephone}\n`;
         }
         if (contact["@type"] === "PostalAddress") {
-            vCard += createAddress(contact, `item${itemCount}.ADR`);
+            vCard += createAddress(contact, `item${itemCount++}.ADR`);
         }
     }
+
+    for (let k = 0; k < key.length; k++) {
+        vCard += ``;
+    }
+
     /*
     item1.ADR;type=HOME;type=pref:;;P.O. Box 1113\nMy Street;Denver;CO;10110;United States
     item1.X-ABADR:us
