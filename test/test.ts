@@ -31,7 +31,7 @@ let {
 } = vcard4;
 
 import { writeFile } from "fs";
-import { Person } from "../src/types/schema"
+import { Person, PostalAddress } from "digital-arsenal-schema-dts";
 
 let myPerson: Person = {
     "@type": "Person",
@@ -40,7 +40,11 @@ let myPerson: Person = {
     honorificPrefix: "Dr.",
     honorificSuffix: "ing. jr, M.Sc.",
     additionalName: "J",
-    
+    address: {
+        "@type": "PostalAddress",
+        streetAddress: "",
+        addressCountry: ""
+    }
 };
 
 console.log(myPerson);
