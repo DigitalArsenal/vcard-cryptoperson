@@ -34,12 +34,16 @@ export const readVCARD = (input: string) => {
             person.honorificSuffix = name[4].join(",");
         }
         if (vCardArray[k][0] === "org") {
-            let org = vCardArray[k][3];
+            let v = vCardArray[k][3];
             person.affiliation = {
                 "@type": "Organization",
-                name: org,
-                legalName: org
+                name: v,
+                legalName: v
             };
+        }
+        if (vCardArray[k][0] === "title") {
+            let v = vCardArray[k][3];
+            person.hasOccupation = v;
         }
     }
     return person;
