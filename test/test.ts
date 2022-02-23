@@ -39,8 +39,8 @@ let myPerson: PersonPublicKey = {
     address: {
         "@type": "PostalAddress",
         "name": "work",
-        postOfficeBoxNumber: "Suite D1-630",
-        streetAddress: "1111 Work Street",
+        postOfficeBoxNumber: "",
+        streetAddress: "1111 Work Street, Suite D1-630",
         addressLocality: "Quebec",
         addressRegion: "QC",
         addressCountry: "Canada",
@@ -76,7 +76,7 @@ let myPerson: PersonPublicKey = {
 
 let v3Card = createV3(myPerson);
 
-console.log(readVCARD(v3Card))
+console.log(v3Card, readVCARD(v3Card))
 let vcard3Path = "./test/vcard3.vcf";
 
 writeFile(vcard3Path, v3Card, () => {

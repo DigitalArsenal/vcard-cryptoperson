@@ -5,8 +5,16 @@ import ICAL from "ical.js";
 import atob from "atob";
 import btoa from "btoa";
 
-const createAddress = (address: PostalAddress, prefix: string = "ADR") => `${prefix};type=${address.name || "work"};type=pref:;${address.postOfficeBoxNumber};${address.streetAddress};${address.addressLocality};${address.addressRegion};${address.postalCode};${address.addressCountry}\n`;
+const createAddress = (address: PostalAddress, prefix: string = "ADR") => {
 
+    let strAddress = address?.streetAddress?.toString().split(",") || [""];
+
+    if (strAddress?.length < 2) {
+        strAddress.push("");
+    }
+    strAddress = strAddress.reverse().map(c => c.trim());
+    return `${prefix};type=${address.name || "work"};type=pref:${address.postOfficeBoxNumber};${strAddress[0]};${strAddress[1]};${address.addressLocality};${address.addressRegion};${address.postalCode};${address.addressCountry}\n`;
+}
 export const readVCARD = (input: string) => {
     var jcalData = ICAL.parse(input);
     let isVCard = false;
@@ -25,7 +33,8 @@ export const readVCARD = (input: string) => {
         }
     }
     for (let k = 0; k < vCardArray.length; k++) {
-        if (vCardArray[k][0] === "n") {
+        let prop = vCardArray[k][0].toLowerCase();
+        if (prop === "n") {
             let name = vCardArray[k][3];
             person.familyName = name[0];
             person.givenName = name[1];
@@ -33,7 +42,7 @@ export const readVCARD = (input: string) => {
             person.honorificPrefix = name[3];
             person.honorificSuffix = name[4].join(",");
         }
-        if (vCardArray[k][0] === "org") {
+        if (prop === "org") {
             let v = vCardArray[k][3];
             person.affiliation = {
                 "@type": "Organization",
@@ -41,12 +50,98 @@ export const readVCARD = (input: string) => {
                 legalName: v
             };
         }
-        if (vCardArray[k][0] === "title") {
+        if (prop === "title") {
             let v = vCardArray[k][3];
             person.hasOccupation = v;
         }
+
+        if (prop === "adr") {
+            let v = vCardArray[k][3];
+            console.log(vCardArray[k]);
+
+            person.address = {
+                "@type": "PostalAddress",
+                postOfficeBoxNumber: v[0],
+                streetAddress: `${v[2]}${v[1].length ? ", " + v[1] : ''}`,
+                addressLocality: v[3],
+                addressRegion: v[4],
+                addressCountry: v[6],
+                postalCode: v[5]
+            }
+        }
+
+
     }
     return person;
+}
+
+export const createCSV = (person: PersonPublicKey) => {
+
+    const headers = {
+        "First Name": person.givenName,
+        "Middle Name": person.additionalName,
+        "Last Name": person.familyName,
+        "Title": person.honorificPrefix,
+        "Suffix": person.honorificSuffix,
+        "Nickname": "",
+        "Given Yomi": "",
+        "Surname Yomi": "",
+        "E-mail Address": "",
+        "E-mail 2 Address": "",
+        "E-mail 3 Address": "",
+        "Home Phone": "",
+        "Home Phone 2": "",
+        "Business Phone": "",
+        "Business Phone 2": "",
+        "Mobile Phone": "",
+        "Car Phone": "",
+        "Other Phone": "",
+        "Primary Phone": "",
+        "Pager": "",
+        "Business Fax": "",
+        "Home Fax": "",
+        "Other Fax": "",
+        "Company Main Phone": "",
+        "Callback": "",
+        "Radio Phone": "",
+        "Telex": "",
+        "TTY/TDD Phone": "",
+        "IMAddress": "",
+        "Job Title": "",
+        "Department": "",
+        "Company": "",
+        "Office Location": "",
+        "Manager's Name": "",
+        "Assistant's Name": "",
+        "Assistant's Phone": "",
+        "Company Yomi": "",
+        "Business Street": "",
+        "Business City": "",
+        "Business State": "",
+        "Business Postal Code": "",
+        "Business Country/Region": "",
+        "Home Street": "",
+        "Home City": "",
+        "Home State": "",
+        "Home Postal Code": "",
+        "Home Country/Region": "",
+        "Other Street": "",
+        "Other City": "",
+        "Other State": "",
+        "Other Postal Code": "",
+        "Other Country/Region": "",
+        "Personal Web Page": "",
+        "Spouse": "",
+        "Schools": "",
+        "Hobby": "",
+        "Location": "",
+        "Web Page": "",
+        "Birthday": "",
+        "Anniversary": "",
+        "Notes": "",
+    };
+
+
 }
 
 export const createV3 = (person: PersonPublicKey, appendJSON: boolean = true) => {
@@ -104,12 +199,7 @@ TITLE:${hasOccupation.name}
         vCard += `item${itemCount}.X-ABLabel:cryptoKey_${k} keyType\n`;
     }
 
-    if (appendJSON) {
-        itemCount++;
-        vCard += `item${itemCount}.X-ABRELATEDNAMES:${btoa(JSON.stringify(person))}\n`;
-        vCard += `item${itemCount}.X-ABLabel:Instance_ID\n`;
-    }
-
+    vCard += `NOTE:${btoa(JSON.stringify(person))}\n`;
     vCard += `END:VCARD`;
     return vCard;
 
