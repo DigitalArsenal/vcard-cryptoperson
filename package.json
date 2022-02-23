@@ -37,6 +37,7 @@
     "atob": "^2.1.2",
     "btoa": "^1.2.1",
     "digital-arsenal-schema-dts": "^1.0.0",
+    "ical.js": "^1.5.0",
     "vcard4": "^3.0.1"
   }
 }

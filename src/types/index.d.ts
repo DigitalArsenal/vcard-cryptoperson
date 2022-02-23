@@ -1,1 +1,2 @@
-export module "atob";
+declare module "atob";
+declare module "ical.js";
