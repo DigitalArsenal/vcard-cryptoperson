@@ -1,4 +1,4 @@
-import { Person, ContactPoint } from "digital-arsenal-schema-dts";
+import { Person } from "schema-dts";
 import { SLIP_0044_TYPE } from "./slip_0044";
 
 export type cryptoKeyBase = {
@@ -14,6 +14,6 @@ export interface cryptoKey extends cryptoKeyBase {
     "@type": "CryptoKey",
 }
 
-export type PersonPublicKey = Person & {
+export type PersonPublicKey = Exclude<Person, string> & {
     key: cryptoKey | Array<cryptoKey>
 }

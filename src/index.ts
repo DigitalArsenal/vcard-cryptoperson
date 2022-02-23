@@ -70,7 +70,6 @@ export const readVCARD = (input: string) => {
             }
         }
 
-
     }
     return person;
 }
@@ -199,7 +198,7 @@ TITLE:${hasOccupation.name}
         vCard += `item${itemCount}.X-ABLabel:cryptoKey_${k} keyType\n`;
     }
 
-    vCard += `NOTE:${btoa(JSON.stringify(person))}\n`;
+    vCard += `NOTE:-----START KEYMASTER-----${btoa(JSON.stringify(person))}-----END KEYMASTER-----\n`;
     vCard += `END:VCARD`;
     return vCard;
 
