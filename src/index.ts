@@ -1,6 +1,6 @@
-import { PersonPublicKey, cryptoKey } from "./class/class";
+import { PersonCryptoKey, cryptoKey } from "./class/class";
 import { SLIP_0044_TYPE } from "./class/slip_0044";
-import { PostalAddress, Organization, Occupation } from "digital-arsenal-schema-dts";
+import { PostalAddress, Organization, Occupation, ContactPoint } from "digital-arsenal-schema-dts";
 import ICAL from "ical.js";
 import atob from "atob";
 import btoa from "btoa";
@@ -13,18 +13,48 @@ const createAddress = (address: PostalAddress, prefix: string = "ADR") => {
         strAddress.push("");
     }
     strAddress = strAddress.reverse().map(c => c.trim());
-    return `${prefix};type=${address.name || "work"};type=pref:${address.postOfficeBoxNumber};${strAddress[0]};${strAddress[1]};${address.addressLocality};${address.addressRegion};${address.postalCode};${address.addressCountry}\n`;
+    let removeSC = (s: string) => s.replaceAll(";", "");
+    let inputs = [
+        prefix,
+        address.name || "work",
+        address.postOfficeBoxNumber,
+        strAddress[0],
+        strAddress[1],
+        address.addressLocality,
+        address.addressRegion,
+        address.postalCode,
+        address.addressCountry
+        //@ts-ignore
+    ].map(removeSC);
+
+    return `${inputs[0]};type=${inputs[1]};type=pref:${inputs[2]};${inputs[3]};${inputs[4]};${inputs[5]};${inputs[6]};${inputs[7]};${inputs[8]}\n`;
+}
+
+const readAddress = function (v: string): any { //Excessive stack depth comparing types 'PostalAddressLeaf' and 'SchemaValue<IdReference | PostalAddressLeaf | Text, "address">
+    return {
+        "@type": "PostalAddress",
+        postOfficeBoxNumber: v[0],
+        streetAddress: `${v[2]}${v[1].length ? ", " + v[1] : ''}`,
+        addressLocality: v[3],
+        addressRegion: v[4],
+        addressCountry: v[6],
+        postalCode: v[5]
+    } as PostalAddress;
+};
+
+const createNote = (person: PersonCryptoKey) => {
+    return `-----START KEYMASTER-----${btoa(JSON.stringify(person))}-----END KEYMASTER-----`
 }
 export const readVCARD = (input: string) => {
     var jcalData = ICAL.parse(input);
-    let isVCard = false;
     let vCardArray = [];
-    let person: PersonPublicKey = {
+    let person: PersonCryptoKey = {
         "@type": "Person",
         key: {
             "@type": "CryptoKey",
-            publicKey: "",
-        }
+            keyAddress: "",
+        },
+        contactPoint: []
     };
     for (let x = 0; x < jcalData.length; x++) {
 
@@ -34,16 +64,15 @@ export const readVCARD = (input: string) => {
     }
     for (let k = 0; k < vCardArray.length; k++) {
         let prop = vCardArray[k][0].toLowerCase();
+        let v = vCardArray[k][3];
         if (prop === "n") {
-            let name = vCardArray[k][3];
-            person.familyName = name[0];
-            person.givenName = name[1];
-            person.additionalName = name[2];
-            person.honorificPrefix = name[3];
-            person.honorificSuffix = name[4].join(",");
+            person.familyName = v[0];
+            person.givenName = v[1];
+            person.additionalName = v[2];
+            person.honorificPrefix = v[3];
+            person.honorificSuffix = v[4].join(",");
         }
         if (prop === "org") {
-            let v = vCardArray[k][3];
             person.affiliation = {
                 "@type": "Organization",
                 name: v,
@@ -51,37 +80,61 @@ export const readVCARD = (input: string) => {
             };
         }
         if (prop === "title") {
-            let v = vCardArray[k][3];
             person.hasOccupation = v;
         }
 
         if (prop === "adr") {
-            let v = vCardArray[k][3];
-            console.log(vCardArray[k]);
-
-            person.address = {
-                "@type": "PostalAddress",
-                postOfficeBoxNumber: v[0],
-                streetAddress: `${v[2]}${v[1].length ? ", " + v[1] : ''}`,
-                addressLocality: v[3],
-                addressRegion: v[4],
-                addressCountry: v[6],
-                postalCode: v[5]
-            }
+            person.address = readAddress(v)
         }
-
+        if (prop === "note") {
+            let sPerson = JSON.parse(atob(v.match(/(-----START KEYMASTER-----)(.*)(-----END KEYMASTER-----)/)[2]));
+            person = sPerson;
+            break;
+        }
     }
     return person;
 }
 
-export const createCSV = (person: PersonPublicKey) => {
+export const createCSV = (person: PersonCryptoKey) => {
+
+    let stripComma = (a: any | undefined): string => {
+        if (a) {
+            return a.replaceAll(",", "");
+        } else {
+            return "";
+        }
+    }
+    let inputs = [
+        person.givenName,
+        person.additionalName,
+        person.familyName,
+        person.honorificPrefix,
+        person.honorificSuffix
+    ];
+    let homeAddress: PostalAddress = { "@type": "PostalAddress" }, businessAddress: PostalAddress = { "@type": "PostalAddress" };
+
+    let cPA = (person.contactPoint as Array<ContactPoint>);
+    if (cPA?.length) {
+        for (let cP = 0; cP < cPA.length; cP++) {
+            if (cPA[cP]["@type"] === "PostalAddress") {
+                if (cPA[cP].name === "home") {
+                    homeAddress = cPA[cP] as PostalAddress;
+                } else if (cPA[cP].name === "work") {
+                    businessAddress = cPA[cP] as PostalAddress;
+                }
+            }
+        }
+
+    }
+
+    inputs = inputs.map(stripComma);
 
     const headers = {
-        "First Name": person.givenName,
-        "Middle Name": person.additionalName,
-        "Last Name": person.familyName,
-        "Title": person.honorificPrefix,
-        "Suffix": person.honorificSuffix,
+        "First Name": inputs[0],
+        "Middle Name": inputs[1],
+        "Last Name": inputs[2],
+        "Title": inputs[3],
+        "Suffix": inputs[4],
         "Nickname": "",
         "Given Yomi": "",
         "Surname Yomi": "",
@@ -105,7 +158,7 @@ export const createCSV = (person: PersonPublicKey) => {
         "Radio Phone": "",
         "Telex": "",
         "TTY/TDD Phone": "",
-        "IMAddress": "",
+        "IMAddress": "bc1q54xdp0rtaxa7aehh9flnav2e4gqdfyeru38zep bc1q54xap0rtaxa7aehh9flnav2e4gqdfyeru38zep",
         "Job Title": "",
         "Department": "",
         "Company": "",
@@ -114,16 +167,16 @@ export const createCSV = (person: PersonPublicKey) => {
         "Assistant's Name": "",
         "Assistant's Phone": "",
         "Company Yomi": "",
-        "Business Street": "",
-        "Business City": "",
-        "Business State": "",
-        "Business Postal Code": "",
-        "Business Country/Region": "",
-        "Home Street": "",
-        "Home City": "",
-        "Home State": "",
-        "Home Postal Code": "",
-        "Home Country/Region": "",
+        "Business Street": `${businessAddress.postOfficeBoxNumber ? businessAddress.postOfficeBoxNumber + " " : ""}${businessAddress.streetAddress}`,
+        "Business City": businessAddress.addressLocality,
+        "Business State": businessAddress.addressRegion,
+        "Business Postal Code": businessAddress.addressCountry,
+        "Business Country/Region": businessAddress.addressCountry,
+        "Home Street": `${homeAddress.postOfficeBoxNumber ? homeAddress.postOfficeBoxNumber + " " : ""}${homeAddress.streetAddress}`,
+        "Home City": homeAddress.addressLocality,
+        "Home State": homeAddress.addressRegion,
+        "Home Postal Code": homeAddress.addressCountry,
+        "Home Country/Region": homeAddress.addressCountry,
         "Other Street": "",
         "Other City": "",
         "Other State": "",
@@ -137,13 +190,13 @@ export const createCSV = (person: PersonPublicKey) => {
         "Web Page": "",
         "Birthday": "",
         "Anniversary": "",
-        "Notes": "",
+        "Notes": createNote(person),
     };
-
-
+    //@ts-ignore
+    return [Object.keys(headers), Object.values(headers)].join("\n");
 }
 
-export const createV3 = (person: PersonPublicKey, appendJSON: boolean = true) => {
+export const createV3 = (person: PersonCryptoKey, appendJSON: boolean = true, extendedKeyMetadata: boolean = false) => {
     //@ts-ignore
     let {
         familyName,
@@ -188,17 +241,23 @@ TITLE:${hasOccupation.name}
 
     for (let k = 0; k < key.length; k++) {
         let thisKey: cryptoKey = key[k];
-        vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.publicKey}\n`;
-        vCard += `item${itemCount}.X-ABLabel:cryptoKey_${k} publicKey\n`;
-        itemCount++;
+
         vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.keyAddress}\n`;
         vCard += `item${itemCount}.X-ABLabel:cryptoKey_${k} keyAddress\n`;
-        itemCount++;
-        vCard += `item${itemCount}.X-ABRELATEDNAMES:${SLIP_0044_TYPE[thisKey.keyType as number]},${thisKey.keyType}\n`;
-        vCard += `item${itemCount}.X-ABLabel:cryptoKey_${k} keyType\n`;
-    }
 
-    vCard += `NOTE:-----START KEYMASTER-----${btoa(JSON.stringify(person))}-----END KEYMASTER-----\n`;
+        if (extendedKeyMetadata) {
+            itemCount++;
+            vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.publicKey}\n`;
+            vCard += `item${itemCount}.X-ABLabel:cryptoKey_${k} publicKey\n`;
+            itemCount++;
+            vCard += `item${itemCount}.X-ABRELATEDNAMES:${SLIP_0044_TYPE[thisKey.keyType as number]},${thisKey.keyType}\n`;
+            vCard += `item${itemCount}.X-ABLabel:cryptoKey_${k} keyType\n`;
+        }
+
+    }
+    if (appendJSON) {
+        vCard += `NOTE:${createNote(person)}\n`;
+    }
     vCard += `END:VCARD`;
     return vCard;
 

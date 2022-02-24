@@ -29,9 +29,9 @@ let {
     VCARD,
 } = vcard4;
 
-import { PersonPublicKey } from "../src/class/class";
+import { PersonCryptoKey } from "../src/class/class";
 
-export const createV4 = (person: PersonPublicKey): string => {
+export const createV4 = (person: PersonCryptoKey): string => {
     throw Error("Not Implemented");
     let { familyName,
         givenName,

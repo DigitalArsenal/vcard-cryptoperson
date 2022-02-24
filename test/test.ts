@@ -1,11 +1,11 @@
 
 
 import { writeFile } from "fs";
-import { PersonPublicKey } from "../src/class/class";
+import { PersonCryptoKey } from "../src/class/class";
 import { SLIP_0044_TYPE } from "../src/class/slip_0044";
-import { createV3, readVCARD } from "../src/index";
+import { createV3, readVCARD, createCSV } from "../src/index";
 
-let myPerson: PersonPublicKey = {
+let myPerson: PersonCryptoKey = {
     "@type": "Person",
     key: [
         {
@@ -50,8 +50,8 @@ let myPerson: PersonPublicKey = {
         {
             "@type": "PostalAddress",
             "name": "home",
-            postOfficeBoxNumber: "Suite D2-630",
-            streetAddress: "2875 Laurier",
+            postOfficeBoxNumber: "",
+            streetAddress: "2875 Laurier, Suite D2-630",
             addressLocality: "Quebec",
             addressRegion: "QC",
             addressCountry: "Canada",
@@ -75,10 +75,18 @@ let myPerson: PersonPublicKey = {
 };
 
 let v3Card = createV3(myPerson);
+let readCard = readVCARD(v3Card);
 
-console.log(v3Card, readVCARD(v3Card))
+console.log(readCard);
+
+let v3CSV = createCSV(myPerson);
 let vcard3Path = "./test/vcard3.vcf";
+let vcard3CSVPath = "./test/vcard3.csv";
 
 writeFile(vcard3Path, v3Card, () => {
+    console.log('vCard written to ' + vcard3Path)
+});
+
+writeFile(vcard3CSVPath, v3CSV, () => {
     console.log('vCard written to ' + vcard3Path)
 });
