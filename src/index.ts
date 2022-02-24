@@ -1,6 +1,6 @@
 import { PersonCryptoKey, cryptoKey } from "./class/class";
 import { SLIP_0044_TYPE } from "./class/slip_0044";
-import { PostalAddress, Organization, Occupation, ContactPoint } from "digital-arsenal-schema-dts";
+import { PostalAddress, Organization, Occupation, ContactPoint } from "schema-dts";
 import ICAL from "ical.js";
 import atob from "atob";
 import btoa from "btoa";
@@ -206,8 +206,8 @@ export const createV3 = (person: PersonCryptoKey, appendJSON: boolean = true, ex
         additionalName,
     } = person;
 
-    let affiliation = person.affiliation as Organization;
-    let hasOccupation = person.hasOccupation as Occupation;
+    let affiliation = person.affiliation as Exclude<Organization, string>;
+    let hasOccupation = person.hasOccupation as Exclude<Occupation, string>;
     let address = person.address as PostalAddress;
     let contactPoint = person.contactPoint as Array<any>;
     let key = person.key as Array<cryptoKey>;
