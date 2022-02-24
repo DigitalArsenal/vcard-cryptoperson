@@ -1,9 +1,9 @@
 {
   "type": "module",
-  "name": "vcard_person",
+  "name": "vcard-cryptoperson",
   "version": "1.0.0",
-  "description": "Schema.org Person to vCard converter",
-  "main": "dist/index.js",
+  "description": "Schema.org Person to limited vCard converter with cryptokey support",
+  "main": "dist/index.mjs",
   "scripts": {
     "build": "rm -rf dist && tsc",
     "test": "node --experimental-specifier-resolution=node --loader ts-node/esm test/test.ts",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TJKoury/vcard_person.git"
+    "url": "git+https://github.com/DigitalArsenal/vcard-cryptoperson.git"
   },
   "keywords": [
     "vcard",
@@ -20,12 +20,12 @@
     "schema.org",
     "person"
   ],
-  "author": "TJKoury",
-  "license": "CLOSED",
+  "author": "DigitalArsenal.io, Inc.",
+  "license": "Apache 2.0",
   "bugs": {
-    "url": "https://github.com/TJKoury/vcard_person/issues"
+    "url": "https://github.com/DigitalArsenal/vcard-cryptoperson/issues"
   },
-  "homepage": "https://github.com/TJKoury/vcard_person#readme",
+  "homepage": "https://github.com/DigitalArsenal/vcard-cryptoperson#readme",
   "devDependencies": {
     "@types/atob": "^2.1.2",
     "@types/btoa": "^1.2.3",
