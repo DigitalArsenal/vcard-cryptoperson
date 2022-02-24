@@ -1,8 +1,0 @@
-BEGIN:VCARD
-VERSION:3.0
-PRODID:-//Apple Inc.//iPhone OS 15.2.1//EN
-N:LastName;FirstName;;;
-FN:FirstName LastName
-item1.ADR;type=HOME;type=pref:;;P.O. Box 1113\nMy Street;Denver;CO;10110;United States
-item1.X-ABADR:us
-END:VCARD

@@ -3,7 +3,7 @@
   "name": "vcard-cryptoperson",
   "version": "1.0.0",
   "description": "Schema.org Person to limited vCard converter with cryptokey support",
-  "main": "dist/index.mjs",
+  "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf dist && tsc",
     "test": "node --experimental-specifier-resolution=node --loader ts-node/esm test/test.ts",
