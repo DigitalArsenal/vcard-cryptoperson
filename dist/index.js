@@ -61,7 +61,7 @@ export const readVCARD = (input) => {
             person.givenName = v[1];
             person.additionalName = v[2];
             person.honorificPrefix = v[3];
-            person.honorificSuffix = v[4] && v[4] !== "undefined" && !Array.isArray(v[4]) ? v[4].join(",") : v[4] !== "undefined" ? "" : v[4];
+            person.honorificSuffix = v[4] && v[4] !== "undefined" && Array.isArray(v[4]) ? v[4].join(",") : v[4] !== "undefined" ? "" : v[4];
         }
         if (prop === "org") {
             person.affiliation = {
