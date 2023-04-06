@@ -1,13 +1,14 @@
 {
   "type": "module",
   "name": "vcard-cryptoperson",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Schema.org Person to limited vCard converter with cryptokey support",
   "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf dist && tsc",
     "test": "node --experimental-specifier-resolution=node --loader ts-node/esm test/test.ts",
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "deploy":"npm run build && git add -A && git commit -m 'update' && git push && npm publish"
   },
   "repository": {
     "type": "git",

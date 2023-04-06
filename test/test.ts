@@ -21,7 +21,6 @@ let myPerson: PersonCryptoKey = {
             keyType: SLIP_0044_TYPE.BTC
         }
     ],
-
     familyName: "Perrault",
     givenName: "Simon",
     honorificPrefix: "Dr.",

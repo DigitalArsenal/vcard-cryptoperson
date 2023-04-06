@@ -70,7 +70,7 @@ export const readVCARD = (input: string) => {
             person.givenName = v[1];
             person.additionalName = v[2];
             person.honorificPrefix = v[3];
-            person.honorificSuffix = v[4].join(",");
+            person.honorificSuffix = v[4] && v[4] !== "undefined" && v[4]?.length ? v[4].join(",") : "";
         }
         if (prop === "org") {
             person.affiliation = {
@@ -206,10 +206,10 @@ export const createV3 = (person: PersonCryptoKey, appendJSON: boolean = true, ex
         additionalName,
     } = person;
 
-    let affiliation = person.affiliation as Exclude<Organization, string>;
-    let hasOccupation = person.hasOccupation as Exclude<Occupation, string>;
+    let affiliation = person.affiliation as Exclude<Organization, string> || {};
+    let hasOccupation = person.hasOccupation as Exclude<Occupation, string> || {};
     let address = person.address as PostalAddress;
-    let contactPoint = person.contactPoint as Array<any>;
+    let contactPoint = person.contactPoint as Array<any> || [];
     let key = person.key as Array<cryptoKey>;
 
     let vCard = `BEGIN:VCARD

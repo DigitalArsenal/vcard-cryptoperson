@@ -61,7 +61,7 @@ export const readVCARD = (input) => {
             person.givenName = v[1];
             person.additionalName = v[2];
             person.honorificPrefix = v[3];
-            person.honorificSuffix = v[4].join(",");
+            person.honorificSuffix = v[4] && v[4] !== "undefined" && v[4]?.length ? v[4].join(",") : "";
         }
         if (prop === "org") {
             person.affiliation = {
@@ -184,10 +184,10 @@ export const createCSV = (person) => {
 export const createV3 = (person, appendJSON = true, extendedKeyMetadata = false) => {
     //@ts-ignore
     let { familyName, givenName, honorificPrefix, honorificSuffix, additionalName, } = person;
-    let affiliation = person.affiliation;
-    let hasOccupation = person.hasOccupation;
+    let affiliation = person.affiliation || {};
+    let hasOccupation = person.hasOccupation || {};
     let address = person.address;
-    let contactPoint = person.contactPoint;
+    let contactPoint = person.contactPoint || [];
     let key = person.key;
     let vCard = `BEGIN:VCARD
 VERSION:3.0
