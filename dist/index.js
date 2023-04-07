@@ -46,7 +46,10 @@ export const readVCARD = (input) => {
             "@type": "CryptoKey",
             keyAddress: "",
         },
-        contactPoint: []
+        hasOccupation: { "@type": "Occupation" },
+        affiliation: { "@type": "Organization" },
+        address: { "@type": "PostalAddress" },
+        contactPoint: [],
     };
     for (let x = 0; x < jcalData.length; x++) {
         if (jcalData[x] === "vcard") {
