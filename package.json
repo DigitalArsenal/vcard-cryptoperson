@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "vcard-cryptoperson",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Schema.org Person to limited vCard converter with cryptokey support",
   "main": "dist/index.js",
   "scripts": {
