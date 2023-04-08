@@ -8,7 +8,7 @@
     "build": "rm -rf dist && tsc",
     "test": "node --experimental-specifier-resolution=node --loader ts-node/esm test/test.ts",
     "dev": "nodemon",
-    "deploy":"npm run build && git add -A && git commit -m 'update' && git push && npm publish"
+    "deploy": "npm run build && git add -A && git commit -m 'update' && git push && npm publish"
   },
   "repository": {
     "type": "git",
@@ -30,15 +30,17 @@
   "devDependencies": {
     "@types/atob": "^2.1.2",
     "@types/btoa": "^1.2.3",
+    "@types/qrcode": "^1.5.0",
+    "@types/qrcode-terminal": "^0.12.0",
     "nodemon": "^2.0.15",
     "ts-node": "^10.9.1",
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "schema-dts": "^1.0.0",
     "atob": "^2.1.2",
     "btoa": "^1.2.1",
     "ical.js": "^1.5.0",
+    "schema-dts": "^1.0.0",
     "vcard4": "^3.0.1"
   }
 }

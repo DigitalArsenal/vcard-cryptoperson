@@ -10,8 +10,8 @@ let myPerson: PersonCryptoKey = {
     key: [
         {
             "@type": "CryptoKey",
-            publicKey: "03b8b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d",
-            keyAddress: "bc1q54xdp0rtaxa7aehh9flnav2e4gqdfyeru38zep",
+            publicKey: "03E9873D79C6D87DC0FB6A5778633389F4453213303DA61F20BD67FC233AA33262",
+            keyAddress: "bc1qyzxdu4px4jy8gwhcj82zpv7qzhvc0fvumgnh0r",
             keyType: SLIP_0044_TYPE.BTC
         },
         {
@@ -76,11 +76,13 @@ let myPerson: PersonCryptoKey = {
 let v3Card = createV3(myPerson);
 let readCard = readVCARD(v3Card);
 
-console.log(readCard);
+//console.log(readCard);
 
 let v3CSV = createCSV(myPerson);
 let vcard3Path = "./test/vcard3.vcf";
 let vcard3CSVPath = "./test/vcard3.csv";
+
+console.log(v3Card);
 
 writeFile(vcard3Path, v3Card, () => {
     console.log('vCard written to ' + vcard3Path)
@@ -89,3 +91,7 @@ writeFile(vcard3Path, v3Card, () => {
 writeFile(vcard3CSVPath, v3CSV, () => {
     console.log('vCard written to ' + vcard3Path)
 });
+
+function execSync(arg0: string) {
+    throw new Error("Function not implemented.");
+}

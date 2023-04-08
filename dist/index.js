@@ -1,6 +1,4 @@
-import { SLIP_0044_TYPE } from "./class/slip_0044";
 import ICAL from "ical.js";
-import atob from "atob";
 import btoa from "btoa";
 const createAddress = (address, prefix = "ADR") => {
     let strAddress = address?.streetAddress?.toString().split(",") || [""];
@@ -59,6 +57,14 @@ export const readVCARD = (input) => {
     for (let k = 0; k < vCardArray.length; k++) {
         let prop = vCardArray[k][0].toLowerCase();
         let v = vCardArray[k][3];
+        /*
+        if (prop === "note" && ~v.indexOf("-----START KEYMASTER-----")) {
+            let sPerson = JSON.parse(atob(v.match(/(-----START KEYMASTER-----)(.*)(-----END KEYMASTER-----)/)[2]));
+            person = sPerson;
+            break;
+        }*/
+        person.key = (person.key || []);
+        console.log(vCardArray[k][0], vCardArray[k][3]);
         if (prop === "n") {
             person.familyName = v[0];
             person.givenName = v[1];
@@ -78,11 +84,6 @@ export const readVCARD = (input) => {
         }
         if (prop === "adr") {
             person.address = readAddress(v);
-        }
-        if (prop === "note") {
-            let sPerson = JSON.parse(atob(v.match(/(-----START KEYMASTER-----)(.*)(-----END KEYMASTER-----)/)[2]));
-            person = sPerson;
-            break;
         }
     }
     return person;
@@ -184,7 +185,7 @@ export const createCSV = (person) => {
     //@ts-ignore
     return [Object.keys(headers), Object.values(headers)].join("\n");
 };
-export const createV3 = (person, appendJSON = true, extendedKeyMetadata = false) => {
+export const createV3 = (person, appendJSON = false /*, extendedKeyMetadata: boolean = false*/) => {
     //@ts-ignore
     let { familyName, givenName, honorificPrefix, honorificSuffix, additionalName, } = person;
     let affiliation = person.affiliation || {};
@@ -218,16 +219,17 @@ TITLE:${hasOccupation.name}
     }
     for (let k = 0; k < key.length; k++) {
         let thisKey = key[k];
-        vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.keyAddress}\n`;
-        vCard += `item${itemCount}.X-ABLabel:cryptoKey_${k} keyAddress\n`;
-        if (extendedKeyMetadata) {
+        vCard += `item${itemCount}.X-ABLabel:publicKey\n`;
+        vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.publicKey}\n`;
+        /*if (extendedKeyMetadata) {
             itemCount++;
-            vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.publicKey}\n`;
-            vCard += `item${itemCount}.X-ABLabel:cryptoKey_${k} publicKey\n`;
+            vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.keyAddress}\n`;
+            vCard += `item${itemCount}.X-ABLabel:${thisKey.keyType} Address\n`;
             itemCount++;
-            vCard += `item${itemCount}.X-ABRELATEDNAMES:${SLIP_0044_TYPE[thisKey.keyType]},${thisKey.keyType}\n`;
-            vCard += `item${itemCount}.X-ABLabel:cryptoKey_${k} keyType\n`;
-        }
+            vCard += `item${itemCount}.X-ABRELATEDNAMES:${SLIP_0044_TYPE[thisKey.keyType as number]},${thisKey.keyType}\n`;
+            vCard += `item${itemCount}.X-ABLabel:keyType\n`;
+        }*/
+        itemCount++;
     }
     if (appendJSON) {
         vCard += `NOTE:${createNote(person)}\n`;
