@@ -38,12 +38,14 @@ const createNote = (person) => {
 export const readVCARD = (input) => {
     var jcalData = ICAL.parse(input);
     let vCardArray = [];
+    let usedKeys = {};
+    let usedItems = {};
     let person = {
         "@type": "Person",
-        key: {
-            "@type": "CryptoKey",
-            keyAddress: "",
-        },
+        key: [{
+                "@type": "CryptoKey",
+                publicKey: "",
+            }],
         hasOccupation: { "@type": "Occupation" },
         affiliation: { "@type": "Organization" },
         address: { "@type": "PostalAddress" },
@@ -57,14 +59,34 @@ export const readVCARD = (input) => {
     for (let k = 0; k < vCardArray.length; k++) {
         let prop = vCardArray[k][0].toLowerCase();
         let v = vCardArray[k][3];
-        /*
-        if (prop === "note" && ~v.indexOf("-----START KEYMASTER-----")) {
-            let sPerson = JSON.parse(atob(v.match(/(-----START KEYMASTER-----)(.*)(-----END KEYMASTER-----)/)[2]));
-            person = sPerson;
-            break;
-        }*/
-        person.key = (person.key || []);
-        console.log(vCardArray[k][0], vCardArray[k][3]);
+        if (vCardArray[k][0].match(/ablabel|ABRELATEDNAMES/ig)) {
+            let [kk1, kk2] = vCardArray[k][3].split(" ");
+            let itemC = vCardArray[k][0].split(".")[0];
+            console.log(itemC, kk1, kk2);
+            if (vCardArray[k][0].match(/ablabel/) && kk1.match(/\bpublicKey(?:Signature)?\b/)) {
+                usedItems[itemC] = usedItems[itemC] || { key: "", keyNumber: "", value: "" };
+                usedItems[itemC].key = kk1;
+                usedItems[itemC].keyNumber = kk2.match(/#[1-9]{1,}/) ? kk2 : undefined;
+            }
+            else {
+                usedItems[itemC] = usedItems[itemC] || { key: "", keyNumber: "", value: "" };
+                usedItems[itemC].value = vCardArray[k][3];
+            }
+        }
+        for (let item in usedItems) {
+            const i = usedItems[item];
+            if (i.key && i.value) {
+                usedKeys[i.keyNumber] = usedKeys[i.keyNumber] || { publicKey: "", signature: "" };
+                if (i.key === "publicKey") {
+                    usedKeys[i.keyNumber].publicKey = i.value;
+                }
+                else if (i.key === "publicKeySignature") {
+                    usedKeys[i.keyNumber].signature = i.value;
+                }
+            }
+        }
+        person.key = Object.values(usedKeys);
+        console.log(person.key);
         if (prop === "n") {
             person.familyName = v[0];
             person.givenName = v[1];
@@ -219,16 +241,11 @@ TITLE:${hasOccupation.name}
     }
     for (let k = 0; k < key.length; k++) {
         let thisKey = key[k];
-        vCard += `item${itemCount}.X-ABLabel:publicKey\n`;
+        vCard += `item${itemCount}.X-ABLabel:publicKey #${k + 1}\n`;
         vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.publicKey}\n`;
-        /*if (extendedKeyMetadata) {
-            itemCount++;
-            vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.keyAddress}\n`;
-            vCard += `item${itemCount}.X-ABLabel:${thisKey.keyType} Address\n`;
-            itemCount++;
-            vCard += `item${itemCount}.X-ABRELATEDNAMES:${SLIP_0044_TYPE[thisKey.keyType as number]},${thisKey.keyType}\n`;
-            vCard += `item${itemCount}.X-ABLabel:keyType\n`;
-        }*/
+        itemCount++;
+        vCard += `item${itemCount}.X-ABLabel:publicKeySignature #${k + 1}\n`;
+        vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.signature || ""}\n`;
         itemCount++;
     }
     if (appendJSON) {

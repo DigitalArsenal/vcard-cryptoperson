@@ -12,13 +12,15 @@ let myPerson: PersonCryptoKey = {
             "@type": "CryptoKey",
             publicKey: "03E9873D79C6D87DC0FB6A5778633389F4453213303DA61F20BD67FC233AA33262",
             keyAddress: "bc1qyzxdu4px4jy8gwhcj82zpv7qzhvc0fvumgnh0r",
-            keyType: SLIP_0044_TYPE.BTC
+            keyType: SLIP_0044_TYPE.BTC,
+            signature: "03E9873D7...233AA33262_signature" //this is not a cryptographic exercise
         },
         {
             "@type": "CryptoKey",
             publicKey: "03b7b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d",
             keyAddress: "bc1q54xap0rtaxa7aehh9flnav2e4gqdfyeru38zep",
-            keyType: SLIP_0044_TYPE.BTC
+            keyType: SLIP_0044_TYPE.BTC,
+            signature: "03b7b4d57...8bd0eafd9d_signature" //this is not a cryptographic exercise
         }
     ],
     familyName: "Perrault",

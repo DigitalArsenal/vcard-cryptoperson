@@ -84,13 +84,6 @@ export const readVCARD = (input: string) => {
         let prop = vCardArray[k][0].toLowerCase();
         let v = vCardArray[k][3];
 
-        /*
-        if (prop === "note" && ~v.indexOf("-----START KEYMASTER-----")) {
-            let sPerson = JSON.parse(atob(v.match(/(-----START KEYMASTER-----)(.*)(-----END KEYMASTER-----)/)[2]));
-            person = sPerson;
-            break;
-        }*/
-
         if (vCardArray[k][0].match(/ablabel|ABRELATEDNAMES/ig)) {
             let [kk1, kk2] = vCardArray[k][3].split(" ");
             let itemC = vCardArray[k][0].split(".")[0];
@@ -297,14 +290,6 @@ TITLE:${hasOccupation.name}
         itemCount++
         vCard += `item${itemCount}.X-ABLabel:publicKeySignature #${k + 1}\n`;
         vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.signature || ""}\n`;
-        /*if (extendedKeyMetadata) {
-            itemCount++;
-            vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.keyAddress}\n`;
-            vCard += `item${itemCount}.X-ABLabel:${thisKey.keyType} Address\n`;
-            itemCount++;
-            vCard += `item${itemCount}.X-ABRELATEDNAMES:${SLIP_0044_TYPE[thisKey.keyType as number]},${thisKey.keyType}\n`;
-            vCard += `item${itemCount}.X-ABLabel:keyType\n`;
-        }*/
         itemCount++
     }
     if (appendJSON) {
