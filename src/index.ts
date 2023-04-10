@@ -1,4 +1,4 @@
-import { PersonCryptoKey, cryptoKey } from "./class/class";
+import { PersonCryptoKey, CryptoKey } from "./class/class";
 import { SLIP_0044_TYPE } from "./class/slip_0044";
 import { PostalAddress, Organization, Occupation, ContactPoint } from "schema-dts";
 import ICAL from "ical.js";
@@ -45,15 +45,30 @@ const readAddress = function (v: string): any { //Excessive stack depth comparin
 const createNote = (person: PersonCryptoKey) => {
     return `-----START KEYMASTER-----${btoa(JSON.stringify(person))}-----END KEYMASTER-----`
 }
+
+
 export const readVCARD = (input: string) => {
     var jcalData = ICAL.parse(input);
     let vCardArray = [];
+    let usedKeys: {
+        [key: string]: CryptoKey
+    } = {};
+
+    let usedItems: {
+        [key: string]: {
+            key: string,
+            value: string,
+            keyNumber: string
+        }
+    } = {};
+
     let person: PersonCryptoKey = {
         "@type": "Person",
-        key: {
+        key: [{
             "@type": "CryptoKey",
-            keyAddress: "",
-        },
+            publicKey: "",
+
+        }],
         hasOccupation: { "@type": "Occupation" },
         affiliation: { "@type": "Organization" },
         address: { "@type": "PostalAddress" },
@@ -75,9 +90,35 @@ export const readVCARD = (input: string) => {
             person = sPerson;
             break;
         }*/
-        person.key = (person.key || [] as any);
-        console.log(vCardArray[k][0], vCardArray[k][3])
 
+        if (vCardArray[k][0].match(/ablabel|ABRELATEDNAMES/ig)) {
+            let [kk1, kk2] = vCardArray[k][3].split(" ");
+            let itemC = vCardArray[k][0].split(".")[0];
+            console.log(itemC, kk1, kk2);
+            if (vCardArray[k][0].match(/ablabel/) && kk1.match(/\bpublicKey(?:Signature)?\b/)) {
+                usedItems[itemC] = usedItems[itemC] || { key: "", keyNumber: "", value: "" };
+                usedItems[itemC].key = kk1;
+                usedItems[itemC].keyNumber = kk2.match(/#[1-9]{1,}/) ? kk2 : undefined;
+            } else {
+                usedItems[itemC] = usedItems[itemC] || { key: "", keyNumber: "", value: "" };
+                usedItems[itemC].value = vCardArray[k][3];
+            }
+        }
+
+        for (let item in usedItems) {
+            const i = usedItems[item];
+            if (i.key && i.value) {
+                usedKeys[i.keyNumber] = usedKeys[i.keyNumber] || { publicKey: "", signature: "" };
+                if (i.key === "publicKey") {
+                    usedKeys[i.keyNumber].publicKey = i.value;
+                } else if (i.key === "publicKeySignature") {
+                    usedKeys[i.keyNumber].signature = i.value;
+                }
+            }
+        }
+        person.key = Object.values(usedKeys);
+
+        console.log(person.key);
 
         if (prop === "n") {
             person.familyName = v[0];
@@ -220,7 +261,7 @@ export const createV3 = (person: PersonCryptoKey, appendJSON: boolean = false/*,
     let hasOccupation = person.hasOccupation as Exclude<Occupation, string> || {};
     let address = person.address as PostalAddress;
     let contactPoint = person.contactPoint as Array<any> || [];
-    let key = person.key as Array<cryptoKey>;
+    let key = person.key as Array<CryptoKey>;
 
     let vCard = `BEGIN:VCARD
 VERSION:3.0
@@ -250,9 +291,12 @@ TITLE:${hasOccupation.name}
 
 
     for (let k = 0; k < key.length; k++) {
-        let thisKey: cryptoKey = key[k];
-        vCard += `item${itemCount}.X-ABLabel:publicKey\n`;
+        let thisKey: CryptoKey = key[k];
+        vCard += `item${itemCount}.X-ABLabel:publicKey #${k + 1}\n`;
         vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.publicKey}\n`;
+        itemCount++
+        vCard += `item${itemCount}.X-ABLabel:publicKeySignature #${k + 1}\n`;
+        vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.signature || ""}\n`;
         /*if (extendedKeyMetadata) {
             itemCount++;
             vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.keyAddress}\n`;

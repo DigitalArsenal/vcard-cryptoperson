@@ -82,8 +82,6 @@ let v3CSV = createCSV(myPerson);
 let vcard3Path = "./test/vcard3.vcf";
 let vcard3CSVPath = "./test/vcard3.csv";
 
-console.log(v3Card);
-
 writeFile(vcard3Path, v3Card, () => {
     console.log('vCard written to ' + vcard3Path)
 });
