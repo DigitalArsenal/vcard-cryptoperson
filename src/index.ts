@@ -73,6 +73,7 @@ export const readVCARD = (input: string) => {
         affiliation: { "@type": "Organization" },
         address: { "@type": "PostalAddress" },
         contactPoint: [],
+        sameAs: ""
     };
     for (let x = 0; x < jcalData.length; x++) {
 

@@ -50,6 +50,7 @@ export const readVCARD = (input) => {
         affiliation: { "@type": "Organization" },
         address: { "@type": "PostalAddress" },
         contactPoint: [],
+        sameAs: ""
     };
     for (let x = 0; x < jcalData.length; x++) {
         if (jcalData[x] === "vcard") {
