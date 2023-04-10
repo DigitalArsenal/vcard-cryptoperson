@@ -5,7 +5,9 @@ export type CryptoKeyBase = {
     //hex publicKey
     publicKey: string,
     signature?: string,
+    xpub?:string,
     privateKey?: string,
+    xpriv?:string,
     keyAddress?: string,
     //https://github.com/satoshilabs/slips/blob/master/slip-0044.md
     keyType?: SLIP_0044_TYPE | number

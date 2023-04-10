@@ -241,7 +241,7 @@ export const createCSV = (person: PersonCryptoKey) => {
     return [Object.keys(headers), Object.values(headers)].join("\n");
 }
 
-export const createV3 = (person: PersonCryptoKey, appendJSON: boolean = false/*, extendedKeyMetadata: boolean = false*/) => {
+export const createV3 = (person: PersonCryptoKey, appendJSON: boolean = false) => {
     //@ts-ignore
     let {
         familyName,

@@ -208,7 +208,7 @@ export const createCSV = (person) => {
     //@ts-ignore
     return [Object.keys(headers), Object.values(headers)].join("\n");
 };
-export const createV3 = (person, appendJSON = false /*, extendedKeyMetadata: boolean = false*/) => {
+export const createV3 = (person, appendJSON = false) => {
     //@ts-ignore
     let { familyName, givenName, honorificPrefix, honorificSuffix, additionalName, } = person;
     let affiliation = person.affiliation || {};
