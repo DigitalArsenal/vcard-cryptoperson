@@ -1,5 +1,9 @@
 import ICAL from "ical.js";
-import btoa from "btoa";
+export { createCSV } from "./lib/createCSV";
+import { createNote } from "./lib/createNote";
+import { keyNameMap } from "./lib/keyNameMap";
+const toMap = Object.keys(keyNameMap);
+const fromMap = Object.values(keyNameMap);
 const createAddress = (address, prefix = "ADR") => {
     let strAddress = address?.streetAddress?.toString().split(",") || [""];
     if (strAddress?.length < 2) {
@@ -32,9 +36,6 @@ const readAddress = function (v) {
         postalCode: v[5]
     };
 };
-const createNote = (person) => {
-    return `-----START KEYMASTER-----${btoa(JSON.stringify(person))}-----END KEYMASTER-----`;
-};
 export const readVCARD = (input) => {
     var jcalData = ICAL.parse(input);
     let vCardArray = [];
@@ -61,13 +62,14 @@ export const readVCARD = (input) => {
         let prop = vCardArray[k][0].toLowerCase();
         let v = vCardArray[k][3];
         if (vCardArray[k][0].match(/ablabel|ABRELATEDNAMES/ig)) {
-            let [kk1, kk2] = vCardArray[k][3].split(" ");
+            let [kk1, kk2] = vCardArray[k][3].split("#");
             let itemC = vCardArray[k][0].split(".")[0];
-            console.log(itemC, kk1, kk2);
-            if (vCardArray[k][0].match(/ablabel/) && kk1.match(/\bpublicKey(?:Signature)?\b/)) {
+            let usedKeyIndex = fromMap.indexOf(kk1.trim());
+            if (vCardArray[k][0].match(/ablabel/i) && ~usedKeyIndex) {
                 usedItems[itemC] = usedItems[itemC] || { key: "", keyNumber: "", value: "" };
-                usedItems[itemC].key = kk1;
-                usedItems[itemC].keyNumber = kk2.match(/#[1-9]{1,}/) ? kk2 : undefined;
+                usedItems[itemC].key = kk1.trim();
+                usedItems[itemC].keyNumber = kk2 ? kk2 : undefined;
+                usedItems[itemC].keyIndex = usedKeyIndex;
             }
             else {
                 usedItems[itemC] = usedItems[itemC] || { key: "", keyNumber: "", value: "" };
@@ -77,17 +79,13 @@ export const readVCARD = (input) => {
         for (let item in usedItems) {
             const i = usedItems[item];
             if (i.key && i.value) {
-                usedKeys[i.keyNumber] = usedKeys[i.keyNumber] || { publicKey: "", signature: "" };
-                if (i.key === "publicKey") {
-                    usedKeys[i.keyNumber].publicKey = i.value;
-                }
-                else if (i.key === "publicKeySignature") {
-                    usedKeys[i.keyNumber].signature = i.value;
-                }
+                usedKeys[i.keyNumber] = usedKeys[i.keyNumber] || { "@type": "CryptoKey", publicKey: "", signature: "" };
+                const propToUse = toMap[i.keyIndex];
+                //@ts-ignore
+                usedKeys[i.keyNumber][propToUse] = propToUse === "addressType" ? parseInt(i.value) : i.value;
             }
         }
         person.key = Object.values(usedKeys);
-        console.log(person.key);
         if (prop === "n") {
             person.familyName = v[0];
             person.givenName = v[1];
@@ -103,110 +101,16 @@ export const readVCARD = (input) => {
             };
         }
         if (prop === "title") {
-            person.hasOccupation = v;
+            person.hasOccupation = {
+                "@type": "Occupation",
+                "name": v
+            };
         }
         if (prop === "adr") {
             person.address = readAddress(v);
         }
     }
     return person;
-};
-export const createCSV = (person) => {
-    let stripComma = (a) => {
-        if (a) {
-            return a.replaceAll(",", "");
-        }
-        else {
-            return "";
-        }
-    };
-    let inputs = [
-        person.givenName,
-        person.additionalName,
-        person.familyName,
-        person.honorificPrefix,
-        person.honorificSuffix
-    ];
-    let homeAddress = { "@type": "PostalAddress" }, businessAddress = { "@type": "PostalAddress" };
-    let cPA = person.contactPoint;
-    if (cPA?.length) {
-        for (let cP = 0; cP < cPA.length; cP++) {
-            if (cPA[cP]["@type"] === "PostalAddress") {
-                if (cPA[cP].name === "home") {
-                    homeAddress = cPA[cP];
-                }
-                else if (cPA[cP].name === "work") {
-                    businessAddress = cPA[cP];
-                }
-            }
-        }
-    }
-    inputs = inputs.map(stripComma);
-    const headers = {
-        "First Name": inputs[0],
-        "Middle Name": inputs[1],
-        "Last Name": inputs[2],
-        "Title": inputs[3],
-        "Suffix": inputs[4],
-        "Nickname": "",
-        "Given Yomi": "",
-        "Surname Yomi": "",
-        "E-mail Address": "",
-        "E-mail 2 Address": "",
-        "E-mail 3 Address": "",
-        "Home Phone": "",
-        "Home Phone 2": "",
-        "Business Phone": "",
-        "Business Phone 2": "",
-        "Mobile Phone": "",
-        "Car Phone": "",
-        "Other Phone": "",
-        "Primary Phone": "",
-        "Pager": "",
-        "Business Fax": "",
-        "Home Fax": "",
-        "Other Fax": "",
-        "Company Main Phone": "",
-        "Callback": "",
-        "Radio Phone": "",
-        "Telex": "",
-        "TTY/TDD Phone": "",
-        "IMAddress": "bc1q54xdp0rtaxa7aehh9flnav2e4gqdfyeru38zep bc1q54xap0rtaxa7aehh9flnav2e4gqdfyeru38zep",
-        "Job Title": "",
-        "Department": "",
-        "Company": "",
-        "Office Location": "",
-        "Manager's Name": "",
-        "Assistant's Name": "",
-        "Assistant's Phone": "",
-        "Company Yomi": "",
-        "Business Street": `${businessAddress.postOfficeBoxNumber ? businessAddress.postOfficeBoxNumber + " " : ""}${businessAddress.streetAddress}`,
-        "Business City": businessAddress.addressLocality,
-        "Business State": businessAddress.addressRegion,
-        "Business Postal Code": businessAddress.addressCountry,
-        "Business Country/Region": businessAddress.addressCountry,
-        "Home Street": `${homeAddress.postOfficeBoxNumber ? homeAddress.postOfficeBoxNumber + " " : ""}${homeAddress.streetAddress}`,
-        "Home City": homeAddress.addressLocality,
-        "Home State": homeAddress.addressRegion,
-        "Home Postal Code": homeAddress.addressCountry,
-        "Home Country/Region": homeAddress.addressCountry,
-        "Other Street": "",
-        "Other City": "",
-        "Other State": "",
-        "Other Postal Code": "",
-        "Other Country/Region": "",
-        "Personal Web Page": "",
-        "Spouse": "",
-        "Schools": "",
-        "Hobby": "",
-        "Location": "",
-        "Web Page": "",
-        "Birthday": "",
-        "Anniversary": "",
-        "Notes": createNote(person),
-    };
-    //@ts-ignore
-    return [Object.keys(headers), Object.values(headers)].join("\n");
 };
 export const createV3 = (person, appendJSON = false) => {
     //@ts-ignore
@@ -242,12 +146,13 @@ TITLE:${hasOccupation.name}
     }
     for (let k = 0; k < key.length; k++) {
         let thisKey = key[k];
-        vCard += `item${itemCount}.X-ABLabel:publicKey #${k + 1}\n`;
-        vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.publicKey}\n`;
-        itemCount++;
-        vCard += `item${itemCount}.X-ABLabel:publicKeySignature #${k + 1}\n`;
-        vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey.signature || ""}\n`;
-        itemCount++;
+        for (let prop in thisKey) {
+            if (~toMap.indexOf(prop)) {
+                vCard += `item${itemCount}.X-ABLabel:${keyNameMap[prop]} #${k + 1}\n`;
+                vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey[prop]}\n`;
+            }
+            itemCount++;
+        }
     }
     if (appendJSON) {
         vCard += `NOTE:${createNote(person)}\n`;
