@@ -6,20 +6,18 @@ FN:Dr. Simon J Perrault
 ORG:Canada Pharma., Inc
 TITLE:Scientist
 ADR;type=work;type=pref:;Suite D1-630;1111 Work Street;Quebec;QC;G1V 2M2;Canada
+item1.X-ABLabel:Digital Signature
+item1.X-ABRELATEDNAMES:everything_but_signature_stringified_and_signed
 item2.X-ABLabel:Public Key #1
 item2.X-ABRELATEDNAMES:03E9873D79C6D87DC0FB6A5778633389F4453213303DA61F20BD67FC233AA33262
-item3.X-ABLabel:Signature #1
-item3.X-ABRELATEDNAMES:03E9873D7...233AA33262_signature
-item4.X-ABLabel:Address #1
-item4.X-ABRELATEDNAMES:bc1qyzxdu4px4jy8gwhcj82zpv7qzhvc0fvumgnh0r
-item5.X-ABLabel:Type #1
-item5.X-ABRELATEDNAMES:0
-item7.X-ABLabel:Public Key #2
-item7.X-ABRELATEDNAMES:03b7b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d
-item8.X-ABLabel:Signature #2
-item8.X-ABRELATEDNAMES:03b7b4d57...8bd0eafd9d_signature
-item9.X-ABLabel:Address #2
-item9.X-ABRELATEDNAMES:bc1q54xap0rtaxa7aehh9flnav2e4gqdfyeru38zep
-item10.X-ABLabel:Type #2
-item10.X-ABRELATEDNAMES:0
+item3.X-ABLabel:Address #1
+item3.X-ABRELATEDNAMES:bc1qyzxdu4px4jy8gwhcj82zpv7qzhvc0fvumgnh0r
+item4.X-ABLabel:Type #1
+item4.X-ABRELATEDNAMES:0
+item5.X-ABLabel:Public Key #2
+item5.X-ABRELATEDNAMES:03b7b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d
+item6.X-ABLabel:Address #2
+item6.X-ABRELATEDNAMES:bc1q54xap0rtaxa7aehh9flnav2e4gqdfyeru38zep
+item7.X-ABLabel:Type #2
+item7.X-ABRELATEDNAMES:0
 END:VCARD

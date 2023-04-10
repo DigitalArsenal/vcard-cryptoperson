@@ -11,3 +11,8 @@ It also includes and extended schema for a [Schema.org Person](https://schema.or
 There is no official support for the "KEY" property in vCard v3, and no wide support for vCard v4.
 
 In addition, there is no support in Schema.org for a cryptocurrency key or address.
+
+## TODO
+
+- [ ] Finish porting over the contactPoint functionality
+- [ ] Docs

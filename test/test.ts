@@ -1,6 +1,6 @@
 
 
-import { writeFile } from "fs";
+import { writeFile, writeFileSync } from "fs";
 import { PersonCryptoKey } from "../src/class/class";
 import { SLIP_0044_TYPE } from "../src/class/slip_0044";
 import { createV3, readVCARD, createCSV } from "../src/index";
@@ -11,14 +11,12 @@ let myPerson: PersonCryptoKey = {
         {
             "@type": "CryptoKey",
             "publicKey": "03E9873D79C6D87DC0FB6A5778633389F4453213303DA61F20BD67FC233AA33262",
-            "signature": "03E9873D7...233AA33262_signature",
             "keyAddress": "bc1qyzxdu4px4jy8gwhcj82zpv7qzhvc0fvumgnh0r",
             "addressType": 0
         },
         {
             "@type": "CryptoKey",
             "publicKey": "03b7b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d",
-            "signature": "03b7b4d57...8bd0eafd9d_signature",
             "keyAddress": "bc1q54xap0rtaxa7aehh9flnav2e4gqdfyeru38zep",
             "addressType": 0
         }
@@ -72,13 +70,16 @@ let myPerson: PersonCryptoKey = {
     "givenName": "Simon",
     "additionalName": "J",
     "honorificPrefix": "Dr.",
-    "honorificSuffix": "ing. jr, M.Sc."
+    "honorificSuffix": "ing. jr, M.Sc.",
+    "signature": "everything_but_signature_stringified_and_signed",
 };
 
 let v3Card = createV3(myPerson);
 let readCard = readVCARD(v3Card);
 
-if (JSON.stringify(myPerson, null, 4) !== JSON.stringify(readCard, null, 4)) {
+if (JSON.stringify(myPerson) !== JSON.stringify(readCard)) {
+    writeFileSync("./test1.json", JSON.stringify(myPerson, null, 4));
+    writeFileSync("./test2.json", JSON.stringify(readCard, null, 4))
     throw Error("Does Not Match");
 }
 

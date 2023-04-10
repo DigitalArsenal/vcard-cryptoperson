@@ -1,0 +1,43 @@
+{
+    "@type": "Person",
+    "key": [
+        {
+            "@type": "CryptoKey",
+            "publicKey": "03E9873D79C6D87DC0FB6A5778633389F4453213303DA61F20BD67FC233AA33262",
+            "keyAddress": "bc1qyzxdu4px4jy8gwhcj82zpv7qzhvc0fvumgnh0r",
+            "addressType": 0
+        },
+        {
+            "@type": "CryptoKey",
+            "publicKey": "03b7b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d",
+            "keyAddress": "bc1q54xap0rtaxa7aehh9flnav2e4gqdfyeru38zep",
+            "addressType": 0
+        }
+    ],
+    "hasOccupation": {
+        "@type": "Occupation",
+        "name": "Scientist"
+    },
+    "affiliation": {
+        "@type": "Organization",
+        "name": "Canada Pharma., Inc",
+        "legalName": "Canada Pharma., Inc"
+    },
+    "address": {
+        "@type": "PostalAddress",
+        "postOfficeBoxNumber": "",
+        "streetAddress": "1111 Work Street, Suite D1-630",
+        "addressLocality": "Quebec",
+        "addressRegion": "QC",
+        "addressCountry": "Canada",
+        "postalCode": "G1V 2M2"
+    },
+    "contactPoint": [],
+    "sameAs": "",
+    "familyName": "Perrault",
+    "givenName": "Simon",
+    "additionalName": "J",
+    "honorificPrefix": "Dr.",
+    "honorificSuffix": "ing. jr, M.Sc.",
+    "signature": "everything_but_signature_stringified_and_signed"
+}

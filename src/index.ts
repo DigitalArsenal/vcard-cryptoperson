@@ -84,28 +84,30 @@ export const readVCARD = (input: string) => {
     for (let k = 0; k < vCardArray.length; k++) {
         let prop = vCardArray[k][0].toLowerCase();
         let v = vCardArray[k][3];
-
-        if (vCardArray[k][0].match(/ablabel|ABRELATEDNAMES/ig)) {
-            let [kk1, kk2] = vCardArray[k][3].split("#");
-            let itemC = vCardArray[k][0].split(".")[0];
+        if (prop.match(/ablabel|abrelatednames/ig)) {
+            let [kk1, kk2] = v.split("#");
+            let itemC = prop.split(".")[0];
             let usedKeyIndex = fromMap.indexOf(kk1.trim());
-            if (vCardArray[k][0].match(/ablabel/i) && ~usedKeyIndex) {
+            if (prop.match(/ablabel/i) && ~usedKeyIndex) {
                 usedItems[itemC] = usedItems[itemC] || { key: "", keyNumber: "", value: "" };
                 usedItems[itemC].key = kk1.trim();
                 usedItems[itemC].keyNumber = kk2 ? kk2 : undefined;
                 usedItems[itemC].keyIndex = usedKeyIndex;
             } else {
                 usedItems[itemC] = usedItems[itemC] || { key: "", keyNumber: "", value: "" };
-                usedItems[itemC].value = vCardArray[k][3];
+                usedItems[itemC].value = v;
             }
         }
+
         for (let item in usedItems) {
             const i = usedItems[item];
-            if (i.key && i.value) {
-                usedKeys[i.keyNumber] = usedKeys[i.keyNumber] || { "@type": "CryptoKey", publicKey: "", signature: "" };
+            if (i.key && i.value && i.key !== "Digital Signature") {
+                usedKeys[i.keyNumber] = usedKeys[i.keyNumber] || { "@type": "CryptoKey" };
                 const propToUse: keyof CryptoKey = toMap[i.keyIndex] as keyof CryptoKey;
                 //@ts-ignore
                 usedKeys[i.keyNumber][propToUse] = propToUse === "addressType" ? parseInt(i.value) : i.value;
+            } else if (i.key === "Digital Signature") {
+                person.signature = i.value;
             }
         }
         person.key = Object.values(usedKeys);
@@ -148,6 +150,7 @@ export const createV3 = (person: PersonCryptoKey, appendJSON: boolean = false) =
         honorificPrefix,
         honorificSuffix,
         additionalName,
+        signature
     } = person;
 
     let affiliation = person.affiliation as Exclude<Organization, string> || {};
@@ -168,6 +171,13 @@ TITLE:${hasOccupation.name}
         vCard += createAddress(address);
     }
     let itemCount: number = 1;
+
+    if (signature) {
+        vCard += `item${itemCount}.X-ABLabel:Digital Signature\n`;
+        vCard += `item${itemCount}.X-ABRELATEDNAMES:${signature}\n`;
+        itemCount++;
+    }
+
     for (let c = 0; c < contactPoint.length; c++) {
         let contact: any = contactPoint[c];
 
@@ -188,8 +198,9 @@ TITLE:${hasOccupation.name}
             if (~toMap.indexOf(prop)) {
                 vCard += `item${itemCount}.X-ABLabel:${keyNameMap[prop]} #${k + 1}\n`;
                 vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey[prop]}\n`;
+                itemCount++;
             }
-            itemCount++;
+
         }
     }
     if (appendJSON) {
