@@ -61,11 +61,11 @@ export const readVCARD = (input) => {
     for (let k = 0; k < vCardArray.length; k++) {
         let prop = vCardArray[k][0].toLowerCase();
         let v = vCardArray[k][3];
-        if (vCardArray[k][0].match(/ablabel|ABRELATEDNAMES/ig)) {
-            let [kk1, kk2] = vCardArray[k][3].split("#");
-            let itemC = vCardArray[k][0].split(".")[0];
+        if (prop.match(/ablabel|abrelatednames/ig)) {
+            let [kk1, kk2] = v.split("#");
+            let itemC = prop.split(".")[0];
             let usedKeyIndex = fromMap.indexOf(kk1.trim());
-            if (vCardArray[k][0].match(/ablabel/i) && ~usedKeyIndex) {
+            if (prop.match(/ablabel/i) && ~usedKeyIndex) {
                 usedItems[itemC] = usedItems[itemC] || { key: "", keyNumber: "", value: "" };
                 usedItems[itemC].key = kk1.trim();
                 usedItems[itemC].keyNumber = kk2 ? kk2 : undefined;
@@ -73,16 +73,19 @@ export const readVCARD = (input) => {
             }
             else {
                 usedItems[itemC] = usedItems[itemC] || { key: "", keyNumber: "", value: "" };
-                usedItems[itemC].value = vCardArray[k][3];
+                usedItems[itemC].value = v;
             }
         }
         for (let item in usedItems) {
             const i = usedItems[item];
-            if (i.key && i.value) {
-                usedKeys[i.keyNumber] = usedKeys[i.keyNumber] || { "@type": "CryptoKey", publicKey: "", signature: "" };
+            if (i.key && i.value && i.key !== "Digital Signature") {
+                usedKeys[i.keyNumber] = usedKeys[i.keyNumber] || { "@type": "CryptoKey" };
                 const propToUse = toMap[i.keyIndex];
                 //@ts-ignore
                 usedKeys[i.keyNumber][propToUse] = propToUse === "addressType" ? parseInt(i.value) : i.value;
+            }
+            else if (i.key === "Digital Signature") {
+                person.signature = i.value;
             }
         }
         person.key = Object.values(usedKeys);
@@ -114,7 +117,7 @@ export const readVCARD = (input) => {
 };
 export const createV3 = (person, appendJSON = false) => {
     //@ts-ignore
-    let { familyName, givenName, honorificPrefix, honorificSuffix, additionalName, } = person;
+    let { familyName, givenName, honorificPrefix, honorificSuffix, additionalName, signature } = person;
     let affiliation = person.affiliation || {};
     let hasOccupation = person.hasOccupation || {};
     let address = person.address;
@@ -132,6 +135,11 @@ TITLE:${hasOccupation.name}
         vCard += createAddress(address);
     }
     let itemCount = 1;
+    if (signature) {
+        vCard += `item${itemCount}.X-ABLabel:Digital Signature\n`;
+        vCard += `item${itemCount}.X-ABRELATEDNAMES:${signature}\n`;
+        itemCount++;
+    }
     for (let c = 0; c < contactPoint.length; c++) {
         let contact = contactPoint[c];
         if (contact.email) {
@@ -150,8 +158,8 @@ TITLE:${hasOccupation.name}
             if (~toMap.indexOf(prop)) {
                 vCard += `item${itemCount}.X-ABLabel:${keyNameMap[prop]} #${k + 1}\n`;
                 vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey[prop]}\n`;
+                itemCount++;
             }
-            itemCount++;
         }
     }
     if (appendJSON) {

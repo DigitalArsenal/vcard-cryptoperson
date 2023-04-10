@@ -1,6 +1,6 @@
 export const keyNameMap = {
     publicKey: "Public Key",
-    signature: "Signature",
+    signature: "Digital Signature",
     xpub: "xPub",
     privateKey: "Private Key",
     xpriv: "xPriv",
