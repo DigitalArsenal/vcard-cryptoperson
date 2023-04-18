@@ -1,5 +1,9 @@
-import { Person } from "schema-dts";
+import { ContactPoint, Person } from "schema-dts";
 import { SLIP_0044_TYPE } from "./slip_0044";
+
+export type ContactPointPref = Partial<ContactPoint> & {
+    pref?: boolean;
+}
 
 export type CryptoKeyBase = {
     //hex publicKey
@@ -18,5 +22,6 @@ export interface CryptoKey extends CryptoKeyBase {
 
 export type PersonCryptoKey = Exclude<Person, string> & {
     key: Array<CryptoKey>
-    signature?: string
+    signature?: string,
+    contactPoint: Array<ContactPointPref>
 }

@@ -23,21 +23,33 @@
         "name": "Canada Pharma., Inc",
         "legalName": "Canada Pharma., Inc"
     },
-    "address": {
-        "@type": "PostalAddress",
-        "postOfficeBoxNumber": "",
-        "streetAddress": "1111 Work Street, Suite D1-630",
-        "addressLocality": "Quebec",
-        "addressRegion": "QC",
-        "addressCountry": "Canada",
-        "postalCode": "G1V 2M2"
-    },
-    "contactPoint": [],
+    "contactPoint": [
+        {
+            "@type": "PostalAddress",
+            "name": "home",
+            "postOfficeBoxNumber": "",
+            "streetAddress": "2875 Laurier, Suite D2-630",
+            "addressLocality": "Quebec",
+            "addressRegion": "QC",
+            "addressCountry": "Canada",
+            "postalCode": "G1V 2M2"
+        },
+        {
+            "@type": "ContactPoint",
+            "contactType": "home",
+            "telephone": "(864) 986-0602"
+        },
+        {
+            "@type": "ContactPoint",
+            "contactType": "work",
+            "email": "home@email.com"
+        }
+    ],
     "sameAs": "",
     "familyName": "Perrault",
     "givenName": "Simon",
     "additionalName": "J",
     "honorificPrefix": "Dr.",
     "honorificSuffix": "ing. jr, M.Sc.",
-    "signature": "sig:everything_but_signature_stringified_and_signed"
+    "signature": "everything_but_signature_stringified_and_signed"
 }

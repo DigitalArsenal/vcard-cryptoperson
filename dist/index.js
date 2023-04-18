@@ -4,7 +4,7 @@ import { createNote } from "./lib/createNote";
 import { keyNameMap } from "./lib/keyNameMap";
 const toMap = Object.keys(keyNameMap);
 const fromMap = Object.values(keyNameMap);
-const createAddress = (address, prefix = "ADR") => {
+const createAddress = (address, prefix = "ADR", pref = false) => {
     let strAddress = address?.streetAddress?.toString().split(",") || [""];
     if (strAddress?.length < 2) {
         strAddress.push("");
@@ -23,11 +23,15 @@ const createAddress = (address, prefix = "ADR") => {
         address.addressCountry
         //@ts-ignore
     ].map(removeSC);
-    return `${inputs[0]};type=${inputs[1]};type=pref:${inputs[2]};${inputs[3]};${inputs[4]};${inputs[5]};${inputs[6]};${inputs[7]};${inputs[8]}\n`;
+    return `${inputs[0]};type=${inputs[1]};${pref ? "type=pref" : ""}:${inputs[2]};${inputs[3]};${inputs[4]};${inputs[5]};${inputs[6]};${inputs[7]};${inputs[8]}\n`;
 };
-const readAddress = function (v) {
+const readAddress = function (v, name = "") {
+    if (!Array.isArray(v)) {
+        v = v.split(";");
+    }
     return {
         "@type": "PostalAddress",
+        name,
         postOfficeBoxNumber: v[0],
         streetAddress: `${v[2]}${v[1].length ? ", " + v[1] : ''}`,
         addressLocality: v[3],
@@ -49,10 +53,10 @@ export const readVCARD = (input) => {
             }],
         hasOccupation: { "@type": "Occupation" },
         affiliation: { "@type": "Organization" },
-        address: { "@type": "PostalAddress" },
         contactPoint: [],
-        sameAs: ""
+        sameAs: "",
     };
+    person.contactPoint = [];
     for (let x = 0; x < jcalData.length; x++) {
         if (jcalData[x] === "vcard") {
             vCardArray = jcalData[x + 1];
@@ -61,6 +65,20 @@ export const readVCARD = (input) => {
     for (let k = 0; k < vCardArray.length; k++) {
         let prop = vCardArray[k][0].toLowerCase();
         let v = vCardArray[k][3];
+        if (prop === "email" || prop === "tel") {
+            const contactType = vCardArray[k][1].type.filter((t) => !~["VOICE", "INTERNET"].indexOf(t))[0];
+            person.contactPoint?.push({
+                "@type": "ContactPoint",
+                contactType,
+                email: prop === "email" ? v : undefined,
+                telephone: prop === "tel" ? v : undefined,
+            });
+        }
+        if (prop.match(/item[0-9]{1,}\.adr/)) {
+            const nameArray = vCardArray[k][1]?.type ? [vCardArray[k][1]?.type] : Array.isArray(vCardArray[k][1]) ? vCardArray[k][1] : [];
+            const address = readAddress(v, nameArray.filter((n) => n.toLowerCase() !== "pref")[0]);
+            person.contactPoint.push(address);
+        }
         if (prop.match(/ablabel|abrelatednames/ig)) {
             let [kk1, kk2] = v.split("#");
             let itemC = prop.split(".")[0];
@@ -132,7 +150,7 @@ ORG:${affiliation.legalName || affiliation.name}
 TITLE:${hasOccupation.name}
 `;
     if (address) {
-        vCard += createAddress(address);
+        vCard += createAddress(address, undefined, true);
     }
     let itemCount = 1;
     if (signature) {

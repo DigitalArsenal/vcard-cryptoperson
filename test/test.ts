@@ -30,16 +30,7 @@ let myPerson: PersonCryptoKey = {
         "name": "Canada Pharma., Inc",
         "legalName": "Canada Pharma., Inc"
     },
-    "address": {
-        "@type": "PostalAddress",
-        "postOfficeBoxNumber": "",
-        "streetAddress": "1111 Work Street, Suite D1-630",
-        "addressLocality": "Quebec",
-        "addressRegion": "QC",
-        "addressCountry": "Canada",
-        "postalCode": "G1V 2M2"
-    },
-    contactPoint: [/*
+    contactPoint: [
         {
             "@type": "PostalAddress",
             "name": "home",
@@ -53,17 +44,13 @@ let myPerson: PersonCryptoKey = {
         {
             "@type": "ContactPoint",
             "contactType": "home",
-            "name": "mobile",
             "telephone": "(864) 986-0602",
-            "email": "mobile@email.com"
         },
         {
             "@type": "ContactPoint",
-            "name": "home",
             "contactType": "work",
-            "telephone": "(555) 986-0602",
             "email": "home@email.com",
-        },*/
+        },
     ],
     "sameAs": "",
     "familyName": "Perrault",
@@ -77,11 +64,8 @@ let myPerson: PersonCryptoKey = {
 let v3Card = createV3(myPerson);
 let readCard = readVCARD(v3Card);
 
-if (JSON.stringify(myPerson) !== JSON.stringify(readCard)) {
-    writeFileSync("./test1.json", JSON.stringify(myPerson, null, 4));
-    writeFileSync("./test2.json", JSON.stringify(readCard, null, 4))
-    throw Error("Does Not Match");
-}
+writeFileSync("./test/test1.json", JSON.stringify(myPerson, null, 4));
+writeFileSync("./test/test2.json", JSON.stringify(readCard, null, 4))
 
 let v3CSV = createCSV(myPerson);
 let vcard3Path = "./test/vcard3.vcf";
@@ -95,6 +79,6 @@ writeFile(vcard3CSVPath, v3CSV, () => {
     console.log('vCard written to ' + vcard3Path)
 });
 
-function execSync(arg0: string) {
-    throw new Error("Function not implemented.");
+if (JSON.stringify(myPerson) !== JSON.stringify(readCard)) {
+    throw Error("Does Not Match");
 }

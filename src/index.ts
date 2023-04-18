@@ -9,7 +9,7 @@ import { keyNameMap } from "./lib/keyNameMap";
 const toMap: Array<string> = Object.keys(keyNameMap);
 const fromMap: Array<string> = Object.values(keyNameMap);
 
-const createAddress = (address: PostalAddress, prefix: string = "ADR") => {
+const createAddress = (address: PostalAddress, prefix: string = "ADR", pref = false) => {
 
     let strAddress = address?.streetAddress?.toString().split(",") || [""];
 
@@ -31,12 +31,18 @@ const createAddress = (address: PostalAddress, prefix: string = "ADR") => {
         //@ts-ignore
     ].map(removeSC);
 
-    return `${inputs[0]};type=${inputs[1]};type=pref:${inputs[2]};${inputs[3]};${inputs[4]};${inputs[5]};${inputs[6]};${inputs[7]};${inputs[8]}\n`;
+    return `${inputs[0]};type=${inputs[1]};${pref ? "type=pref" : ""}:${inputs[2]};${inputs[3]};${inputs[4]};${inputs[5]};${inputs[6]};${inputs[7]};${inputs[8]}\n`;
 }
 
-const readAddress = function (v: string): any { //Excessive stack depth comparing types 'PostalAddressLeaf' and 'SchemaValue<IdReference | PostalAddressLeaf | Text, "address">
+const readAddress = function (v: string | Array<string>, name: string = ""): any { //Excessive stack depth comparing types 'PostalAddressLeaf' and 'SchemaValue<IdReference | PostalAddressLeaf | Text, "address">
+
+    if (!Array.isArray(v)) {
+        v = v.split(";");
+    }
+    
     return {
         "@type": "PostalAddress",
+        name,
         postOfficeBoxNumber: v[0],
         streetAddress: `${v[2]}${v[1].length ? ", " + v[1] : ''}`,
         addressLocality: v[3],
@@ -71,10 +77,12 @@ export const readVCARD = (input: string) => {
         }],
         hasOccupation: { "@type": "Occupation" },
         affiliation: { "@type": "Organization" },
-        address: { "@type": "PostalAddress" },
         contactPoint: [],
-        sameAs: ""
+        sameAs: "",
     };
+
+    person.contactPoint = [] as Array<ContactPoint>;
+
     for (let x = 0; x < jcalData.length; x++) {
 
         if (jcalData[x] === "vcard") {
@@ -84,6 +92,25 @@ export const readVCARD = (input: string) => {
     for (let k = 0; k < vCardArray.length; k++) {
         let prop = vCardArray[k][0].toLowerCase();
         let v = vCardArray[k][3];
+
+        if (prop === "email" || prop === "tel") {
+            const contactType = vCardArray[k][1].type.filter((t: any) => !~["VOICE", "INTERNET"].indexOf(t))[0];
+            person.contactPoint?.push({
+                "@type": "ContactPoint",
+                contactType,
+                email: prop === "email" ? v : undefined,
+                telephone: prop === "tel" ? v : undefined,
+            });
+        }
+
+        if (prop.match(/item[0-9]{1,}\.adr/)) {
+            const nameArray = vCardArray[k][1]?.type ? [vCardArray[k][1]?.type] : Array.isArray(vCardArray[k][1]) ? vCardArray[k][1] : [];
+            const address = readAddress(
+                v,
+                nameArray.filter((n: string) => n.toLowerCase() !== "pref")[0]);
+            person.contactPoint.push(address);
+        }
+
         if (prop.match(/ablabel|abrelatednames/ig)) {
             let [kk1, kk2] = v.split("#");
             let itemC = prop.split(".")[0];
@@ -156,7 +183,7 @@ export const createV3 = (person: PersonCryptoKey, appendJSON: boolean = false) =
     let affiliation = person.affiliation as Exclude<Organization, string> || {};
     let hasOccupation = person.hasOccupation as Exclude<Occupation, string> || {};
     let address = person.address as PostalAddress;
-    let contactPoint = person.contactPoint as Array<any> || [];
+    let contactPoint = person.contactPoint as Array<ContactPoint> || [];
     let key = person.key as Array<CryptoKey>;
 
     let vCard = `BEGIN:VCARD
@@ -168,7 +195,7 @@ ORG:${affiliation.legalName || affiliation.name}
 TITLE:${hasOccupation.name}
 `;
     if (address) {
-        vCard += createAddress(address);
+        vCard += createAddress(address, undefined, true);
     }
     let itemCount: number = 1;
 
