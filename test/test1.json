@@ -3,7 +3,7 @@
     "ALTERNATE_NAME": null,
     "DESCRIPTION": null,
     "IMAGE": null,
-    "SAME_AS": null,
+    "SAME_AS": "http://google.com",
     "URL": null,
     "TELEPHONE": null,
     "EMAIL": null,

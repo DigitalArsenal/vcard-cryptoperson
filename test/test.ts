@@ -60,6 +60,7 @@ myPerson.CONTACT_POINT = [];
 myPerson.CONTACT_POINT.push(postalAddress);
 myPerson.CONTACT_POINT.push(contactPoint1);
 myPerson.CONTACT_POINT.push(contactPoint2);
+myPerson.SAME_AS = "http://google.com"
 
 let v3Card = createV3(myPerson);
 let vcard3Path = "./test/vcard3.vcf";

@@ -153,6 +153,14 @@ export const readVCARD = (input: string) => {
             const address = readAddress(v);
             person.CONTACT_POINT.push(address);
         }
+
+        if (prop === "photo") {
+            person.IMAGE = v;
+        }
+
+        if (prop === "url") {
+            person.SAME_AS = v;
+        }
     }
 
     return person;
@@ -173,6 +181,12 @@ FN:${person.HONORIFIC_PREFIX} ${person.GIVEN_NAME} ${person.ADDITIONAL_NAME} ${p
 ORG:${affiliation?.LEGAL_NAME || affiliation?.NAME}
 TITLE:${hasOccupation?.NAME}
 `;
+    if (person.IMAGE) {
+        vCard += `PHOTO;VALUE=URI:${person.IMAGE}\n`;
+    }
+    if (person.SAME_AS) {
+        vCard += `URL:${person.SAME_AS}\n`;
+    }
 
     for (const contact of contactPoint) {
         if (contact.EMAIL) {
