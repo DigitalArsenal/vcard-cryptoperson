@@ -197,7 +197,7 @@ TITLE:${hasOccupation?.NAME}
     for (let k = 0; k < key.length; k++) {
         let thisKey: CryptoKeyT | any = key[k];
         for (let prop in thisKey) {
-            if (~toMap.indexOf(prop)) {
+            if (~toMap.indexOf(prop) && thisKey[prop]) {
                 vCard += `item${itemCount}.X-ABLabel:${keyNameMap[prop]} #${k + 1}\n`;
                 vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey[prop]}\n`;
                 itemCount++;

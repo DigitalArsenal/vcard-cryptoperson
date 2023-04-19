@@ -12,7 +12,6 @@ There is no official support for the "KEY" property in vCard v3, and no wide sup
 
 In addition, there is no support in Schema.org for a cryptocurrency key or address.
 
-## TODO
+## Notes
 
-- [ ] Finish porting over the contactPoint functionality
-- [ ] Docs
+Current datastructure is taken from a new standard on SpaceDatatStandards.org, the [UPM](https://spacedatastandards.org/#/Standard/SDS-7-User-Profile-Message-(UPM))
