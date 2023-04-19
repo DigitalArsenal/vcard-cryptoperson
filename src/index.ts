@@ -1,62 +1,64 @@
-import { PersonCryptoKey, CryptoKey } from "./class/class";
 import { SLIP_0044_TYPE } from "./class/slip_0044";
 import { PostalAddress, Organization, Occupation, ContactPoint } from "schema-dts";
 import ICAL from "ical.js";
-export { createCSV } from "./lib/createCSV";
-import { createNote } from "./lib/createNote";
 import { keyNameMap } from "./lib/keyNameMap";
+import { UPMT } from "../src/class/UPM/UPM";
+import { OccupationT } from "../src/class/UPM/Occupation";
+import { ContactPointT } from "../src/class/UPM/ContactPoint";
+import { OrganizationT } from "../src/class/UPM/Organization";
+import { CryptoKeyT } from "../src/class/UPM/CryptoKey";
 
 const toMap: Array<string> = Object.keys(keyNameMap);
 const fromMap: Array<string> = Object.values(keyNameMap);
 
-const createAddress = (address: PostalAddress, prefix: string = "ADR", pref = false) => {
+const createAddress = (address: ContactPointT, prefix: string = "ADR", pref = false) => {
 
-    let strAddress = address?.streetAddress?.toString().split(",") || [""];
+    let strAddress = address?.STREET_ADDRESS?.toString().split(",") || [""];
 
     if (strAddress?.length < 2) {
         strAddress.push("");
     }
     strAddress = strAddress.reverse().map(c => c.trim());
-    let removeSC = (s: string) => s.replaceAll(";", "");
+    let removeSC = (s: string) => s?.replaceAll(";", "");
     let inputs = [
         prefix,
-        address.name || "work",
-        address.postOfficeBoxNumber,
+        address.NAME || "work",
+        address.POST_OFFICE_BOX_NUMBER,
         strAddress[0],
         strAddress[1],
-        address.addressLocality,
-        address.addressRegion,
-        address.postalCode,
-        address.addressCountry
+        address.ADDRESS_LOCALITY,
+        address.ADDRESS_REGION,
+        address.POSTAL_CODE,
+        address.ADDRESS_COUNTRY
         //@ts-ignore
     ].map(removeSC);
 
     return `${inputs[0]};type=${inputs[1]};${pref ? "type=pref" : ""}:${inputs[2]};${inputs[3]};${inputs[4]};${inputs[5]};${inputs[6]};${inputs[7]};${inputs[8]}\n`;
-}
+};
 
-const readAddress = function (v: string | Array<string>, name: string = ""): any { //Excessive stack depth comparing types 'PostalAddressLeaf' and 'SchemaValue<IdReference | PostalAddressLeaf | Text, "address">
+const readAddress = function (v: string | Array<string>, name: string | null = null): ContactPointT {
 
     if (!Array.isArray(v)) {
         v = v.split(";");
     }
-    
-    return {
-        "@type": "PostalAddress",
-        name,
-        postOfficeBoxNumber: v[0],
-        streetAddress: `${v[2]}${v[1].length ? ", " + v[1] : ''}`,
-        addressLocality: v[3],
-        addressRegion: v[4],
-        addressCountry: v[6],
-        postalCode: v[5]
-    } as PostalAddress;
+
+    let postalAddress: ContactPointT = new ContactPointT();
+    postalAddress.NAME = name;
+    postalAddress.POST_OFFICE_BOX_NUMBER = v[0];
+    postalAddress.STREET_ADDRESS = `${v[2]}${v[1].length ? ", " + v[1] : ''}`;
+    postalAddress.ADDRESS_LOCALITY = v[3];
+    postalAddress.ADDRESS_REGION = v[4];
+    postalAddress.ADDRESS_COUNTRY = v[6];
+    postalAddress.POSTAL_CODE = v[5];
+
+    return postalAddress;
 };
 
 export const readVCARD = (input: string) => {
     var jcalData = ICAL.parse(input);
     let vCardArray = [];
     let usedKeys: {
-        [key: string]: CryptoKey
+        [key: string]: CryptoKeyT
     } = {};
 
     let usedItems: {
@@ -68,20 +70,7 @@ export const readVCARD = (input: string) => {
         }
     } = {};
 
-    let person: PersonCryptoKey = {
-        "@type": "Person",
-        key: [{
-            "@type": "CryptoKey",
-            publicKey: "",
-
-        }],
-        hasOccupation: { "@type": "Occupation" },
-        affiliation: { "@type": "Organization" },
-        contactPoint: [],
-        sameAs: "",
-    };
-
-    person.contactPoint = [] as Array<ContactPoint>;
+    let person = new UPMT();
 
     for (let x = 0; x < jcalData.length; x++) {
 
@@ -95,12 +84,14 @@ export const readVCARD = (input: string) => {
 
         if (prop === "email" || prop === "tel") {
             const contactType = vCardArray[k][1].type.filter((t: any) => !~["VOICE", "INTERNET"].indexOf(t))[0];
-            person.contactPoint?.push({
-                "@type": "ContactPoint",
-                contactType,
-                email: prop === "email" ? v : undefined,
-                telephone: prop === "tel" ? v : undefined,
-            });
+            let contactPoint = new ContactPointT();
+            contactPoint.CONTACT_TYPE = contactType;
+            if (prop === "email") {
+                contactPoint.EMAIL = v;
+            } else {
+                contactPoint.TELEPHONE = v;
+            }
+            person.CONTACT_POINT.push(contactPoint);
         }
 
         if (prop.match(/item[0-9]{1,}\.adr/)) {
@@ -108,7 +99,7 @@ export const readVCARD = (input: string) => {
             const address = readAddress(
                 v,
                 nameArray.filter((n: string) => n.toLowerCase() !== "pref")[0]);
-            person.contactPoint.push(address);
+            person.CONTACT_POINT.push(address);
         }
 
         if (prop.match(/ablabel|abrelatednames/ig)) {
@@ -128,112 +119,94 @@ export const readVCARD = (input: string) => {
 
         for (let item in usedItems) {
             const i = usedItems[item];
-            if (i.key && i.value && i.key !== "Digital Signature") {
-                usedKeys[i.keyNumber] = usedKeys[i.keyNumber] || { "@type": "CryptoKey" };
-                const propToUse: keyof CryptoKey = toMap[i.keyIndex] as keyof CryptoKey;
+            if (i.key && i.value) {
+                usedKeys[i.keyNumber] = usedKeys[i.keyNumber] || new CryptoKeyT();
+                const propToUse: keyof CryptoKeyT = toMap[i.keyIndex] as keyof CryptoKeyT;
                 //@ts-ignore
-                usedKeys[i.keyNumber][propToUse] = propToUse === "addressType" ? parseInt(i.value) : i.value;
-            } else if (i.key === "Digital Signature") {
-                person.signature = i.value;
+                usedKeys[i.keyNumber][propToUse] = propToUse === "ADDRESS_TYPE" ? parseInt(i.value) : i.value === "null" ? null : i.value;
             }
-        }
-        person.key = Object.values(usedKeys);
+        };
+        person.KEY = Object.values(usedKeys);
 
         if (prop === "n") {
-            person.familyName = v[0];
-            person.givenName = v[1];
-            person.additionalName = v[2];
-            person.honorificPrefix = v[3];
-            person.honorificSuffix = v[4] && v[4] !== "undefined" && Array.isArray(v[4]) ? v[4].join(",") : v[4] !== "undefined" ? "" : v[4];
+            person.FAMILY_NAME = v[0];
+            person.GIVEN_NAME = v[1];
+            person.ADDITIONAL_NAME = v[2];
+            person.HONORIFIC_PREFIX = v[3];
+            person.HONORIFIC_SUFFIX = v[4] && v[4] !== "undefined" && Array.isArray(v[4]) ? v[4].join(",") : v[4] !== "undefined" ? "" : v[4];
         }
 
         if (prop === "org") {
-            person.affiliation = {
-                "@type": "Organization",
-                name: v,
-                legalName: v
-            };
+            let organization = new OrganizationT();
+            organization.NAME = v;
+            organization.LEGAL_NAME = v;
+            person.AFFILIATION = organization;
         }
+
         if (prop === "title") {
-            person.hasOccupation = {
-                "@type": "Occupation",
-                "name": v
-            };
+            let occupation = new OccupationT();
+            occupation.NAME = v;
+            person.HAS_OCCUPATION = occupation;
         }
 
         if (prop === "adr") {
-            person.address = readAddress(v)
+            const address = readAddress(v);
+            person.CONTACT_POINT.push(address);
         }
     }
 
     return person;
 }
 
-export const createV3 = (person: PersonCryptoKey, appendJSON: boolean = false) => {
-    //@ts-ignore
-    let {
-        familyName,
-        givenName,
-        honorificPrefix,
-        honorificSuffix,
-        additionalName,
-        signature
-    } = person;
 
-    let affiliation = person.affiliation as Exclude<Organization, string> || {};
-    let hasOccupation = person.hasOccupation as Exclude<Occupation, string> || {};
-    let address = person.address as PostalAddress;
-    let contactPoint = person.contactPoint as Array<ContactPoint> || [];
-    let key = person.key as Array<CryptoKey>;
+export const createV3 = (person: UPMT, note: string = "") => {
+    let affiliation = person.AFFILIATION;
+    let hasOccupation = person.HAS_OCCUPATION;
+    let contactPoint = person.CONTACT_POINT || [];
+    let key = person.KEY;
 
     let vCard = `BEGIN:VCARD
 VERSION:3.0
 PRODID;VALUE=TEXT:-//Apple Inc.//iPhone OS 15.1.1//EN
-N:${familyName};${givenName};${additionalName};${honorificPrefix};${honorificSuffix}
-FN:${honorificPrefix} ${givenName} ${additionalName} ${familyName}
-ORG:${affiliation.legalName || affiliation.name}
-TITLE:${hasOccupation.name}
+N:${person.FAMILY_NAME};${person.GIVEN_NAME};${person.ADDITIONAL_NAME};${person.HONORIFIC_PREFIX};${person.HONORIFIC_SUFFIX}
+FN:${person.HONORIFIC_PREFIX} ${person.GIVEN_NAME} ${person.ADDITIONAL_NAME} ${person.FAMILY_NAME}
+ORG:${affiliation?.LEGAL_NAME || affiliation?.NAME}
+TITLE:${hasOccupation?.NAME}
 `;
-    if (address) {
-        vCard += createAddress(address, undefined, true);
+
+    for (const contact of contactPoint) {
+        if (contact.EMAIL) {
+            vCard += `EMAIL;type=INTERNET;type=${contact.CONTACT_TYPE}:${contact.EMAIL}\n`;
+        }
+        if (contact.TELEPHONE) {
+            vCard += `TEL;type=${contact.CONTACT_TYPE};type=VOICE:${contact.TELEPHONE}\n`;
+        }
+
+        if (
+            contact.STREET_ADDRESS ||
+            contact.ADDRESS_COUNTRY ||
+            contact.ADDRESS_LOCALITY ||
+            contact.ADDRESS_REGION ||
+            contact.POSTAL_CODE) {
+            vCard += createAddress(contact, undefined, true);
+        }
     }
+
     let itemCount: number = 1;
 
-    if (signature) {
-        vCard += `item${itemCount}.X-ABLabel:Digital Signature\n`;
-        vCard += `item${itemCount}.X-ABRELATEDNAMES:${signature}\n`;
-        itemCount++;
-    }
-
-    for (let c = 0; c < contactPoint.length; c++) {
-        let contact: any = contactPoint[c];
-
-        if (contact.email) {
-            vCard += `EMAIL;type=INTERNET;type=${contact.contactType}:${contact.email}\n`;
-        }
-        if (contact.telephone) {
-            vCard += `TEL;type=${contact.contactType};type=VOICE:${contact.telephone}\n`;
-        }
-        if (contact["@type"] === "PostalAddress") {
-            vCard += createAddress(contact, `item${itemCount++}.ADR`);
-        }
-    }
-
     for (let k = 0; k < key.length; k++) {
-        let thisKey: CryptoKey | any = key[k];
+        let thisKey: CryptoKeyT | any = key[k];
         for (let prop in thisKey) {
             if (~toMap.indexOf(prop)) {
                 vCard += `item${itemCount}.X-ABLabel:${keyNameMap[prop]} #${k + 1}\n`;
                 vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey[prop]}\n`;
                 itemCount++;
             }
-
         }
     }
-    if (appendJSON) {
-        vCard += `NOTE:${createNote(person)}\n`;
+    if (note) {
+        vCard += `NOTE:${note}\n`;
     }
     vCard += `END:VCARD`;
     return vCard;
-
 }

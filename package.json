@@ -39,6 +39,7 @@
   "dependencies": {
     "atob": "^2.1.2",
     "btoa": "^1.2.1",
+    "flatbuffers": "^23.3.3",
     "ical.js": "^1.5.0",
     "schema-dts": "^1.0.0",
     "vcard4": "^3.0.1"

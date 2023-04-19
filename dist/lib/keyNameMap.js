@@ -1,9 +1,9 @@
 export const keyNameMap = {
-    publicKey: "Public Key",
-    signature: "Digital Signature",
-    xpub: "xPub",
-    privateKey: "Private Key",
-    xpriv: "xPriv",
-    keyAddress: "Address",
-    addressType: "Type"
+    PUBLIC_KEY: "Public Key",
+    SIGNATURE: "Digital Signature",
+    XPUB: "xPub",
+    PRIVATE_KEY: "Private Key",
+    XPRIV: "xPriv",
+    KEY_ADDRESS: "Address",
+    ADDRESS_TYPE: "Type"
 };

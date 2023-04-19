@@ -5,21 +5,31 @@ N:Perrault;Simon;J;Dr.;ing. jr, M.Sc.
 FN:Dr. Simon J Perrault
 ORG:Canada Pharma., Inc
 TITLE:Scientist
-item1.X-ABLabel:Digital Signature
-item1.X-ABRELATEDNAMES:everything_but_signature_stringified_and_signed
-item2.ADR;type=home;:;Suite D2-630;2875 Laurier;Quebec;QC;G1V 2M2;Canada
+ADR;type=work;type=pref:;Suite D2-630;2875 Laurier;Quebec;QC;G1V 2M2;Canada
 TEL;type=home;type=VOICE:(864) 986-0602
 EMAIL;type=INTERNET;type=work:home@email.com
-item3.X-ABLabel:Public Key #1
-item3.X-ABRELATEDNAMES:03E9873D79C6D87DC0FB6A5778633389F4453213303DA61F20BD67FC233AA33262
-item4.X-ABLabel:Address #1
-item4.X-ABRELATEDNAMES:bc1qyzxdu4px4jy8gwhcj82zpv7qzhvc0fvumgnh0r
-item5.X-ABLabel:Type #1
-item5.X-ABRELATEDNAMES:0
-item6.X-ABLabel:Public Key #2
-item6.X-ABRELATEDNAMES:03b7b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d
-item7.X-ABLabel:Address #2
-item7.X-ABRELATEDNAMES:bc1q54xap0rtaxa7aehh9flnav2e4gqdfyeru38zep
-item8.X-ABLabel:Type #2
-item8.X-ABRELATEDNAMES:0
+item1.X-ABLabel:Public Key #1
+item1.X-ABRELATEDNAMES:03E9873D79C6D87DC0FB6A5778633389F4453213303DA61F20BD67FC233AA33262
+item2.X-ABLabel:xPub #1
+item2.X-ABRELATEDNAMES:null
+item3.X-ABLabel:Private Key #1
+item3.X-ABRELATEDNAMES:null
+item4.X-ABLabel:xPriv #1
+item4.X-ABRELATEDNAMES:null
+item5.X-ABLabel:Address #1
+item5.X-ABRELATEDNAMES:bc1qyzxdu4px4jy8gwhcj82zpv7qzhvc0fvumgnh0r
+item6.X-ABLabel:Type #1
+item6.X-ABRELATEDNAMES:0
+item7.X-ABLabel:Public Key #2
+item7.X-ABRELATEDNAMES:03b7b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d
+item8.X-ABLabel:xPub #2
+item8.X-ABRELATEDNAMES:null
+item9.X-ABLabel:Private Key #2
+item9.X-ABRELATEDNAMES:null
+item10.X-ABLabel:xPriv #2
+item10.X-ABRELATEDNAMES:null
+item11.X-ABLabel:Address #2
+item11.X-ABRELATEDNAMES:bc1q54xap0rtaxa7aehh9flnav2e4gqdfyeru38zep
+item12.X-ABLabel:Type #2
+item12.X-ABRELATEDNAMES:0
 END:VCARD

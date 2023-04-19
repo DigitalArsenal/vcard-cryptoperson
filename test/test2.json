@@ -1,55 +1,89 @@
 {
-    "@type": "Person",
-    "key": [
+    "NAME": null,
+    "ALTERNATE_NAME": null,
+    "DESCRIPTION": null,
+    "IMAGE": null,
+    "SAME_AS": null,
+    "URL": null,
+    "TELEPHONE": null,
+    "EMAIL": null,
+    "KEY": [
         {
-            "@type": "CryptoKey",
-            "publicKey": "03E9873D79C6D87DC0FB6A5778633389F4453213303DA61F20BD67FC233AA33262",
-            "keyAddress": "bc1qyzxdu4px4jy8gwhcj82zpv7qzhvc0fvumgnh0r",
-            "addressType": 0
+            "PUBLIC_KEY": "03E9873D79C6D87DC0FB6A5778633389F4453213303DA61F20BD67FC233AA33262",
+            "XPUB": null,
+            "PRIVATE_KEY": null,
+            "XPRIV": null,
+            "KEY_ADDRESS": "bc1qyzxdu4px4jy8gwhcj82zpv7qzhvc0fvumgnh0r",
+            "ADDRESS_TYPE": 0
         },
         {
-            "@type": "CryptoKey",
-            "publicKey": "03b7b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d",
-            "keyAddress": "bc1q54xap0rtaxa7aehh9flnav2e4gqdfyeru38zep",
-            "addressType": 0
+            "PUBLIC_KEY": "03b7b4d57a2adb4adda5e7b43132546f7ea3bbc8457e85913efbc44c8bd0eafd9d",
+            "XPUB": null,
+            "PRIVATE_KEY": null,
+            "XPRIV": null,
+            "KEY_ADDRESS": "bc1q54xap0rtaxa7aehh9flnav2e4gqdfyeru38zep",
+            "ADDRESS_TYPE": 0
         }
     ],
-    "hasOccupation": {
-        "@type": "Occupation",
-        "name": "Scientist"
-    },
-    "affiliation": {
-        "@type": "Organization",
-        "name": "Canada Pharma., Inc",
-        "legalName": "Canada Pharma., Inc"
-    },
-    "contactPoint": [
+    "CONTACT_POINT": [
         {
-            "@type": "PostalAddress",
-            "name": "home",
-            "postOfficeBoxNumber": "",
-            "streetAddress": "2875 Laurier, Suite D2-630",
-            "addressLocality": "Quebec",
-            "addressRegion": "QC",
-            "addressCountry": "Canada",
-            "postalCode": "G1V 2M2"
+            "NAME": null,
+            "CONTACT_TYPE": null,
+            "EMAIL": null,
+            "TELEPHONE": null,
+            "CONTACT_OPTION": null,
+            "AREA_SERVED": null,
+            "AVAILABLE_LANGUAGE": null,
+            "ADDRESS_COUNTRY": "Canada",
+            "ADDRESS_REGION": "QC",
+            "ADDRESS_LOCALITY": "Quebec",
+            "POSTAL_CODE": "G1V 2M2",
+            "STREET_ADDRESS": "2875 Laurier, Suite D2-630",
+            "POST_OFFICE_BOX_NUMBER": ""
         },
         {
-            "@type": "ContactPoint",
-            "contactType": "home",
-            "telephone": "(864) 986-0602"
+            "NAME": null,
+            "CONTACT_TYPE": "home",
+            "EMAIL": null,
+            "TELEPHONE": "(864) 986-0602",
+            "CONTACT_OPTION": null,
+            "AREA_SERVED": null,
+            "AVAILABLE_LANGUAGE": null,
+            "ADDRESS_COUNTRY": null,
+            "ADDRESS_REGION": null,
+            "ADDRESS_LOCALITY": null,
+            "POSTAL_CODE": null,
+            "STREET_ADDRESS": null,
+            "POST_OFFICE_BOX_NUMBER": null
         },
         {
-            "@type": "ContactPoint",
-            "contactType": "work",
-            "email": "home@email.com"
+            "NAME": null,
+            "CONTACT_TYPE": "work",
+            "EMAIL": "home@email.com",
+            "TELEPHONE": null,
+            "CONTACT_OPTION": null,
+            "AREA_SERVED": null,
+            "AVAILABLE_LANGUAGE": null,
+            "ADDRESS_COUNTRY": null,
+            "ADDRESS_REGION": null,
+            "ADDRESS_LOCALITY": null,
+            "POSTAL_CODE": null,
+            "STREET_ADDRESS": null,
+            "POST_OFFICE_BOX_NUMBER": null
         }
     ],
-    "sameAs": "",
-    "familyName": "Perrault",
-    "givenName": "Simon",
-    "additionalName": "J",
-    "honorificPrefix": "Dr.",
-    "honorificSuffix": "ing. jr, M.Sc.",
-    "signature": "everything_but_signature_stringified_and_signed"
+    "ADDRESS": null,
+    "JOB_TITLE": null,
+    "AFFILIATION": {
+        "NAME": "Canada Pharma., Inc",
+        "LEGAL_NAME": "Canada Pharma., Inc"
+    },
+    "HAS_OCCUPATION": {
+        "NAME": "Scientist"
+    },
+    "FAMILY_NAME": "Perrault",
+    "GIVEN_NAME": "Simon",
+    "ADDITIONAL_NAME": "J",
+    "HONORIFIC_PREFIX": "Dr.",
+    "HONORIFIC_SUFFIX": "ing. jr, M.Sc."
 }

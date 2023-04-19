@@ -1,9 +1,10 @@
-import { PersonCryptoKey, CryptoKey } from "../class/class";
+import { UPMT } from "../class/UPM/UPM";
+import { ContactPointT } from "../class/UPM/ContactPoint"
 import { SLIP_0044_TYPE } from "../class/slip_0044";
-import { PostalAddress, Organization, Occupation, ContactPoint } from "schema-dts";
-import { createNote } from "./createNote";
+import { CryptoKeyT } from "../class/UPM/CryptoKey";
 
-export const createCSV = (person: PersonCryptoKey) => {
+export const createCSV = (person: UPMT, note?: string) => {
+    throw Error("NOT IMPLEMENTED");
 
     let stripComma = (a: any | undefined): string => {
         if (a) {
@@ -13,27 +14,15 @@ export const createCSV = (person: PersonCryptoKey) => {
         }
     }
     let inputs = [
-        person.givenName,
-        person.additionalName,
-        person.familyName,
-        person.honorificPrefix,
-        person.honorificSuffix
+        person.GIVEN_NAME,
+        person.ADDITIONAL_NAME,
+        person.FAMILY_NAME,
+        person.HONORIFIC_PREFIX,
+        person.HONORIFIC_SUFFIX
     ];
-    let homeAddress: PostalAddress = { "@type": "PostalAddress" }, businessAddress: PostalAddress = { "@type": "PostalAddress" };
 
-    let cPA = (person.contactPoint as Array<ContactPoint>);
-    if (cPA?.length) {
-        for (let cP = 0; cP < cPA.length; cP++) {
-            if (cPA[cP]["@type"] === "PostalAddress") {
-                if (cPA[cP].name === "home") {
-                    homeAddress = cPA[cP] as PostalAddress;
-                } else if (cPA[cP].name === "work") {
-                    businessAddress = cPA[cP] as PostalAddress;
-                }
-            }
-        }
-
-    }
+    const businessAddress: ContactPointT = person.CONTACT_POINT.find((c: ContactPointT) => c.ADDRESS_COUNTRY && c.CONTACT_TYPE === "work") || new ContactPointT();
+    const homeAddress: ContactPointT = person.CONTACT_POINT.find((c: ContactPointT) => c.ADDRESS_COUNTRY && c.CONTACT_TYPE === "home") || new ContactPointT();
 
     inputs = inputs.map(stripComma);
 
@@ -66,7 +55,7 @@ export const createCSV = (person: PersonCryptoKey) => {
         "Radio Phone": "",
         "Telex": "",
         "TTY/TDD Phone": "",
-        "IMAddress": "bc1q54xdp0rtaxa7aehh9flnav2e4gqdfyeru38zep bc1q54xap0rtaxa7aehh9flnav2e4gqdfyeru38zep",
+        "IMAddress": person.KEY.map((k: CryptoKeyT) => k.PUBLIC_KEY).join(", "),
         "Job Title": "",
         "Department": "",
         "Company": "",
@@ -75,16 +64,16 @@ export const createCSV = (person: PersonCryptoKey) => {
         "Assistant's Name": "",
         "Assistant's Phone": "",
         "Company Yomi": "",
-        "Business Street": `${businessAddress.postOfficeBoxNumber ? businessAddress.postOfficeBoxNumber + " " : ""}${businessAddress.streetAddress}`,
-        "Business City": businessAddress.addressLocality,
-        "Business State": businessAddress.addressRegion,
-        "Business Postal Code": businessAddress.addressCountry,
-        "Business Country/Region": businessAddress.addressCountry,
-        "Home Street": `${homeAddress.postOfficeBoxNumber ? homeAddress.postOfficeBoxNumber + " " : ""}${homeAddress.streetAddress}`,
-        "Home City": homeAddress.addressLocality,
-        "Home State": homeAddress.addressRegion,
-        "Home Postal Code": homeAddress.addressCountry,
-        "Home Country/Region": homeAddress.addressCountry,
+        "Business Street": `${businessAddress.POST_OFFICE_BOX_NUMBER ? businessAddress.POST_OFFICE_BOX_NUMBER + " " : ""}${businessAddress.STREET_ADDRESS}`,
+        "Business City": businessAddress.ADDRESS_LOCALITY,
+        "Business State": businessAddress.ADDRESS_REGION,
+        "Business Postal Code": businessAddress.ADDRESS_COUNTRY,
+        "Business Country/Region": businessAddress.ADDRESS_COUNTRY,
+        "Home Street": `${homeAddress.POST_OFFICE_BOX_NUMBER ? homeAddress.POST_OFFICE_BOX_NUMBER + " " : ""}${homeAddress.STREET_ADDRESS}`,
+        "Home City": homeAddress.ADDRESS_LOCALITY,
+        "Home State": homeAddress.ADDRESS_REGION,
+        "Home Postal Code": homeAddress.ADDRESS_COUNTRY,
+        "Home Country/Region": homeAddress.ADDRESS_COUNTRY,
         "Other Street": "",
         "Other City": "",
         "Other State": "",
@@ -98,7 +87,7 @@ export const createCSV = (person: PersonCryptoKey) => {
         "Web Page": "",
         "Birthday": "",
         "Anniversary": "",
-        "Notes": createNote(person),
+        "Notes": note,
     };
     //@ts-ignore
     return [Object.keys(headers), Object.values(headers)].join("\n");
