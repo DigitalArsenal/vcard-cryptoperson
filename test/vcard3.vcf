@@ -5,7 +5,8 @@ N:Perrault;Simon;J;Dr.;ing. jr, M.Sc.
 FN:Dr. Simon J Perrault
 ORG:Canada Pharma., Inc
 TITLE:Scientist
-URL:http://google.com
+PHOTO;VALUE=URI:https://digitalarsenal.io/assets/image5.png
+URL:http://digitalarsenal.io
 ADR;type=work;type=pref:;Suite D2-630;2875 Laurier;Quebec;QC;G1V 2M2;Canada
 TEL;type=home;type=VOICE:(864) 986-0602
 EMAIL;type=INTERNET;type=work:home@email.com

@@ -60,21 +60,19 @@ myPerson.CONTACT_POINT = [];
 myPerson.CONTACT_POINT.push(postalAddress);
 myPerson.CONTACT_POINT.push(contactPoint1);
 myPerson.CONTACT_POINT.push(contactPoint2);
-myPerson.SAME_AS = "http://google.com"
+myPerson.SAME_AS = "http://digitalarsenal.io"
+myPerson.IMAGE = "https://digitalarsenal.io/assets/image5.png";
 
-let v3Card = createV3(myPerson);
+
+let v3Card = createV3(JSON.parse(JSON.stringify(myPerson)));
+let readCard = readVCARD(v3Card);
+
 let vcard3Path = "./test/vcard3.vcf";
 
 writeFileSync(vcard3Path, v3Card);
-let readCard = readVCARD(v3Card);
-
 writeFileSync("./test/test1.json", JSON.stringify(myPerson, null, 4));
 writeFileSync("./test/test2.json", JSON.stringify(readCard, null, 4))
 
-
-
-
-
 if (JSON.stringify(myPerson) !== JSON.stringify(readCard)) {
     throw Error("Does Not Match");
-}/**/
+}
