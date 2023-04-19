@@ -14,7 +14,7 @@ let myPerson: UPMT = new UPMT();
 myPerson.FAMILY_NAME = "Perrault";
 myPerson.GIVEN_NAME = "Simon";
 myPerson.ADDITIONAL_NAME = "J";
-myPerson.HONORIFIC_PREFIX = "Dr.";
+myPerson.HONORIFIC_PREFIX = "";
 myPerson.HONORIFIC_SUFFIX = "ing. jr, M.Sc.";
 
 let cryptoKey1: CryptoKeyT = new CryptoKeyT();

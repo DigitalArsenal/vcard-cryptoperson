@@ -130,6 +130,7 @@ export const readVCARD = (input) => {
     }
     return person;
 };
+const nCheck = (v) => v || "";
 export const createV3 = (person, note = "") => {
     let affiliation = person.AFFILIATION;
     let hasOccupation = person.HAS_OCCUPATION;
@@ -138,10 +139,10 @@ export const createV3 = (person, note = "") => {
     let vCard = `BEGIN:VCARD
 VERSION:3.0
 PRODID;VALUE=TEXT:-//Apple Inc.//iPhone OS 15.1.1//EN
-N:${person.FAMILY_NAME};${person.GIVEN_NAME};${person.ADDITIONAL_NAME};${person.HONORIFIC_PREFIX};${person.HONORIFIC_SUFFIX}
-FN:${person.HONORIFIC_PREFIX} ${person.GIVEN_NAME} ${person.ADDITIONAL_NAME} ${person.FAMILY_NAME}
-ORG:${affiliation?.LEGAL_NAME || affiliation?.NAME}
-TITLE:${hasOccupation?.NAME}
+N:${nCheck(person.FAMILY_NAME)};${nCheck(person.GIVEN_NAME)};${nCheck(person.ADDITIONAL_NAME)};${nCheck(person.HONORIFIC_PREFIX)};${nCheck(person.HONORIFIC_SUFFIX)}
+FN:${nCheck(person.HONORIFIC_PREFIX)} ${nCheck(person.GIVEN_NAME)} ${nCheck(person.ADDITIONAL_NAME)} ${nCheck(person.FAMILY_NAME)}
+ORG:${nCheck(affiliation?.LEGAL_NAME || affiliation?.NAME)}
+TITLE:${nCheck(hasOccupation?.NAME)}
 `;
     if (person.IMAGE) {
         vCard += `PHOTO;VALUE=URI:${person.IMAGE}\n`;

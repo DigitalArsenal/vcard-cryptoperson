@@ -1,8 +1,8 @@
 BEGIN:VCARD
 VERSION:3.0
 PRODID;VALUE=TEXT:-//Apple Inc.//iPhone OS 15.1.1//EN
-N:Perrault;Simon;J;Dr.;ing. jr, M.Sc.
-FN:Dr. Simon J Perrault
+N:Perrault;Simon;J;;ing. jr, M.Sc.
+FN: Simon J Perrault
 ORG:Canada Pharma., Inc
 TITLE:Scientist
 PHOTO;VALUE=URI:https://digitalarsenal.io/assets/image5.png
