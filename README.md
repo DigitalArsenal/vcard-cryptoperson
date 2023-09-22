@@ -14,4 +14,4 @@ In addition, there is no support in Schema.org for a cryptocurrency key or addre
 
 ## Notes
 
-Current datastructure is taken from a new standard on SpaceDatatStandards.org, the [UPM](https://spacedatastandards.org/#/Standard/SDS-7-User-Profile-Message-(UPM))
+Current datastructure is taken from a new standard on SpaceDataStandards.org, the [UPM](https://spacedatastandards.org/#/Standard/SDS-7-User-Profile-Message-(UPM))
