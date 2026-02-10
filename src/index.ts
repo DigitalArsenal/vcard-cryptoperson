@@ -213,7 +213,8 @@ TITLE:${nCheck(hasOccupation?.NAME)}
         let thisKey: CryptoKeyT | any = key[k];
         for (let prop in thisKey) {
             if (~toMap.indexOf(prop) && thisKey[prop]) {
-                vCard += `item${itemCount}.X-ABLabel:${keyNameMap[prop]} #${k + 1}\n`;
+                const label = thisKey.LABEL != null ? `${keyNameMap[prop]} ${thisKey.LABEL}`.trim() : `${keyNameMap[prop]} #${k + 1}`;
+                vCard += `item${itemCount}.X-ABLabel:${label}\n`;
                 vCard += `item${itemCount}.X-ABRELATEDNAMES:${thisKey[prop]}\n`;
                 itemCount++;
             }
